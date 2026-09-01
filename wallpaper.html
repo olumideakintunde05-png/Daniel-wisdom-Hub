@@ -1,0 +1,1640 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#000000"/>
+<title>Daniel Wisdom Hub — Wallpapers</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,100..900;1,9..144,100..900&family=Outfit:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=Inter:wght@300;400;500&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:   #080810;
+  --ink1:  #0f0f1a;
+  --ink2:  #161624;
+  --ink3:  #1e1e2e;
+  --ink4:  #27273c;
+  --wire:  rgba(255,255,255,0.07);
+  --wire2: rgba(255,255,255,0.13);
+  --snow:  #f0effe;
+  --snow2: #a8a6c8;
+  --fog:   #56547a;
+  --rose:  #ff6b9d;
+  --amber: #ffb347;
+  --sky:   #6ec6ff;
+  --lime:  #90f08c;
+  --grad-a: linear-gradient(135deg,#ff6b9d,#ffb347);
+  --grad-d: linear-gradient(135deg,#ffb347,#ff6b9d,#c084fc);
+  --serif: 'Fraunces', Georgia, serif;
+  --sans:  'Outfit', system-ui, sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{width:100%;height:100%;background:#000;overflow:hidden}
+body{font-family:'Inter',sans-serif;-webkit-font-smoothing:antialiased}
+
+/* ── CONTAINER ── */
+#reel{
+  width:100%;
+  height:100dvh;
+  overflow-y:scroll;
+  scroll-snap-type:y mandatory;
+  scroll-behavior:smooth;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+}
+#reel::-webkit-scrollbar{display:none}
+
+/* ── SLIDE ── */
+.slide{
+  position:relative;
+  width:100%;
+  height:95dvh;
+  scroll-snap-align:start;
+  scroll-snap-stop:always;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:space-between;
+  border-radius:42px;
+}
+.slide.wp-hidden{display:none}
+
+/* background image */
+.slide-bg{
+  position:absolute;
+  inset:0;
+  background-size:cover;
+  background-position:left center; /* these quote wallpapers have text baked in on the left side of the image — cropping from center was cutting it off */
+  filter:brightness(.97) saturate(1);
+}
+
+/* overlay gradient — kept light so the photo stays close to what you uploaded;
+   only darkens near the top/bottom edges where text sits, for legibility */
+.slide-overlay{
+  position:absolute;
+  inset:0;
+  background:linear-gradient(
+    to bottom,
+    rgba(0,0,0,.40) 0%,
+    rgba(0,0,0,.06) 22%,
+    rgba(0,0,0,.02) 55%,
+    rgba(0,0,0,.38) 78%,
+    rgba(0,0,0,.62) 100%
+  );
+}
+
+/* ── TOP: BRANDING ── */
+.slide-brand{
+  position:relative;z-index:3;
+  padding:calc(env(safe-area-inset-top,0px) + 18px) 0 0;
+  font-size:10px;font-weight:500;
+  letter-spacing:3px;text-transform:uppercase;
+  color:rgba(255,255,255,.28);
+}
+
+/* ── QUOTE BLOCK ── */
+.slide-quote{
+  position:relative;z-index:3;
+  width:100%;
+  padding:0 32px;
+  text-align:center;
+  margin-top:-8vh;
+}
+.slide-line{
+  display:block;
+  width:28px;height:1px;
+  background:rgba(255,255,255,.22);
+  margin:0 auto 22px;
+}
+.slide-text{
+  font-family:'Cormorant Garamond',Georgia,serif;
+  font-style:italic;
+  font-weight:300;
+  font-size:clamp(26px,7.5vw,44px);
+  line-height:1.38;
+  color:#fff;
+  letter-spacing:.01em;
+  margin-bottom:20px;
+}
+.slide-author{
+  font-size:11px;
+  font-weight:400;
+  letter-spacing:2.5px;
+  text-transform:uppercase;
+  color:rgba(255,255,255,.45);
+}
+
+/* ── BOTTOM: CONTROLS ── */
+.slide-bottom{
+  position:relative;z-index:3;
+  width:100%;
+  padding:0 22px calc(env(safe-area-inset-bottom,0px) + 22px);
+  display:flex;
+  align-items:flex-end;
+  justify-content:space-between;
+}
+
+/* category tag */
+.slide-tag{
+  font-size:9px;font-weight:500;
+  letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.32);
+  border:1px solid rgba(255,255,255,.14);
+  padding:5px 12px;border-radius:50px;
+  backdrop-filter:blur(6px);
+}
+
+/* right side buttons */
+.slide-actions{
+  display:flex;flex-direction:column;gap:14px;align-items:center;
+}
+.action-btn{
+  width:44px;height:44px;border-radius:50%;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.14);
+  backdrop-filter:blur(10px);
+  color:#fff;font-size:17px;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;transition:all .2s ease;
+}
+.action-btn:hover{background:rgba(255,255,255,.18);transform:scale(1.08)}
+.action-btn:active{transform:scale(.92)}
+.action-btn.saved{background:rgba(255,255,255,.22);border-color:rgba(255,255,255,.4)}
+
+/* ── PROGRESS DOTS ── */
+#dots{
+  position:fixed;right:10px;top:50%;
+  transform:translateY(-50%);
+  z-index:100;
+  display:flex;flex-direction:column;gap:6px;
+}
+.dot{
+  width:3px;height:3px;border-radius:50%;
+  background:rgba(255,255,255,.25);
+  transition:all .3s ease;cursor:pointer;
+}
+.dot.on{height:18px;border-radius:2px;background:#fff}
+
+/* ── COUNTER ── */
+#counter{
+  position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px)+10px);
+  transform:translateX(-50%);
+  z-index:100;
+  font-size:10px;font-weight:500;letter-spacing:2px;
+  color:rgba(255,255,255,.25);
+  pointer-events:none;
+}
+
+/* ── TOAST ── */
+#toast{
+  position:fixed;bottom:calc(env(safe-area-inset-bottom,0px)+80px);
+  left:50%;transform:translateX(-50%) translateY(10px);
+  background:rgba(30,30,30,.95);
+  border:1px solid rgba(255,255,255,.1);
+  color:#fff;padding:9px 20px;border-radius:50px;
+  font-size:12px;font-weight:400;letter-spacing:.5px;
+  opacity:0;transition:all .28s ease;pointer-events:none;
+  z-index:200;white-space:nowrap;
+  backdrop-filter:blur(12px);
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ── CANVAS ── */
+#dlCanvas{display:none}
+
+/* ── SWIPE HINT ── */
+.swipe-hint{
+  position:fixed;bottom:calc(env(safe-area-inset-bottom,0px)+70px);
+  left:50%;transform:translateX(-50%);
+  font-size:9px;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.2);z-index:100;pointer-events:none;
+  animation:pulse 3s ease infinite;
+}
+@keyframes pulse{0%,100%{opacity:.2}50%{opacity:.5}}
+
+/* ── LOADING SHIMMER ── */
+.slide-bg::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.03),transparent);
+  animation:shim 2s infinite;
+}
+
+/* ── IMAGE SKELETON ── shown over a slide/card while its image is still loading ── */
+.img-skel{
+  position:absolute;inset:0;z-index:1;
+  background:linear-gradient(90deg,var(--ink2) 25%,var(--ink3) 37%,var(--ink2) 63%);
+  background-size:400% 100%;
+  animation:skelShim 1.4s ease infinite;
+  opacity:1;transition:opacity .35s ease;
+  pointer-events:none;
+}
+.img-skel.loaded{opacity:0}
+@keyframes skelShim{
+  0%{background-position:100% 0}
+  100%{background-position:0 0}
+}
+
+/* ── AD GATE — full-screen interstitial shown before entering the reel
+   (how often is set in admin panel → Ads). The uploaded image IS the
+   whole ad creative (its own background, text, button already baked
+   in) — background-size:contain shows it intact, letterboxed in
+   black, never cropped. ── */
+.ad-gate{
+  position:fixed;inset:0;z-index:99999;background:#0a0a0f;
+  display:flex;flex-direction:column;animation:adGateFade .2s ease;
+}
+@keyframes adGateFade{from{opacity:0}to{opacity:1}}
+.ad-gate-bar{
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  padding:calc(env(safe-area-inset-top,0px) + 10px) 14px 10px;
+  background:#17171f;border-bottom:1px solid rgba(255,255,255,.08);
+}
+.ad-gate-back{
+  width:32px;height:32px;border-radius:50%;flex-shrink:0;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.08);color:#fff;font-size:16px;
+}
+.ad-gate-brand{display:flex;align-items:center;gap:8px;flex:1;min-width:0}
+.ad-gate-icon{
+  width:26px;height:26px;border-radius:8px;flex-shrink:0;font-size:14px;
+  background:linear-gradient(135deg,#ffb347,#ff6b9d);
+  display:flex;align-items:center;justify-content:center;
+}
+.ad-gate-name{color:#fff;font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ad-gate-continue{
+  display:flex;align-items:center;gap:8px;flex-shrink:0;cursor:default;
+  padding:8px 14px;border-radius:20px;font-size:12px;font-weight:600;
+  background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);
+  transition:background .2s,color .2s;
+}
+.ad-gate-continue.ready{background:rgba(255,255,255,.16);color:#fff;cursor:pointer}
+.ad-gate-spinner{
+  width:14px;height:14px;border-radius:50%;flex-shrink:0;
+  border:2px solid rgba(255,255,255,.2);border-top-color:rgba(255,255,255,.75);
+  animation:adGateSpin .7s linear infinite;
+}
+@keyframes adGateSpin{to{transform:rotate(360deg)}}
+.ad-gate-arrow{font-size:15px}
+.ad-gate-body{flex:1;position:relative;background:#000;cursor:pointer;overflow:hidden}
+.ad-gate-img{position:absolute;inset:0;background-size:cover;background-position:center}
+.ad-gate-cta{
+  position:absolute;left:50%;bottom:calc(env(safe-area-inset-bottom,0px) + 26px);
+  transform:translateX(-50%);z-index:5;
+  background:#fff;color:#111;font-weight:700;font-size:14px;
+  padding:14px 34px;border-radius:50px;border:none;cursor:pointer;
+  letter-spacing:.3px;box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.ad-badge{
+  position:absolute;top:calc(env(safe-area-inset-top,0px) + 18px);left:18px;z-index:5;
+  background:rgba(0,0,0,.55);backdrop-filter:blur(6px);
+  border:1px solid rgba(255,255,255,.18);color:rgba(255,255,255,.85);
+  font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;
+  padding:5px 12px;border-radius:50px;
+}
+
+/* ── NETWORK ERROR BANNER ── */
+#netBanner{
+  position:fixed;top:0;left:0;right:0;z-index:300;
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:calc(env(safe-area-inset-top,0px)+12px) 16px 12px;
+  background:rgba(120,20,30,.94);backdrop-filter:blur(14px);
+  color:#fff;font-size:12.5px;font-weight:500;line-height:1.35;
+  transform:translateY(-100%);transition:transform .3s ease;
+}
+#netBanner.show{transform:translateY(0)}
+#netBanner .nb-msg{flex:1}
+#netBanner .nb-retry{
+  flex-shrink:0;background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.25);
+  color:#fff;padding:7px 14px;border-radius:50px;font-size:11.5px;font-weight:700;cursor:pointer;
+}
+/* ══════════════════════════════════
+   BOTTOM NAV + GRID BROWSE VIEW
+══════════════════════════════════ */
+.wp-view{display:none}
+.wp-view.on{display:block}
+
+/* ══════════════════════════════════
+   LESSON-UNLOCK GATE
+   Blocks the whole app until we know whether this visitor has unlocked
+   at least one lesson. "wp-checking" = still finding out (nothing shown
+   yet, avoids a flash of locked/unlocked content). "wp-locked" = confirmed
+   zero unlocked lessons, gate message shown.
+══════════════════════════════════ */
+body.wp-checking #wpViewDiscover, body.wp-checking #wpViewGrid, body.wp-checking #wpViewReel,
+body.wp-checking #wpViewDetail, body.wp-checking #wpViewFav, body.wp-checking #wpViewDownloads,
+body.wp-checking #wpBotNav,
+body.wp-locked #wpViewDiscover, body.wp-locked #wpViewGrid, body.wp-locked #wpViewReel,
+body.wp-locked #wpViewDetail, body.wp-locked #wpViewFav, body.wp-locked #wpViewDownloads,
+body.wp-locked #wpBotNav{
+  display:none !important;
+}
+#wpLockGate{display:none;position:fixed;inset:0;z-index:200;background:#0a0a12;
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 32px;}
+body.wp-locked #wpLockGate{display:flex}
+.wp-lock-icon{font-size:38px;margin-bottom:18px}
+.wp-lock-title{font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:23px;color:#fff;margin-bottom:10px}
+.wp-lock-sub{font-size:13.5px;line-height:1.5;color:rgba(255,255,255,.55);max-width:320px;margin-bottom:28px}
+.wp-lock-btn{
+  background:linear-gradient(90deg,#ff5f7e,#ffb347);color:#1a0d05;font-weight:700;font-size:14.5px;
+  padding:14px 32px;border-radius:50px;cursor:pointer;
+}
+.wp-lock-back{margin-top:18px;font-size:12.5px;color:rgba(255,255,255,.4);cursor:pointer}
+
+/* ══════════════════════════════════
+   SINGLE WALLPAPER DETAIL VIEW
+   Static — no swipe, no watermark, no scroll hint.
+   Just the image + Back / Save / Download.
+══════════════════════════════════ */
+#wpViewDetail{position:fixed;inset:0;z-index:60;background:#000}
+.wp-detail-img{
+  position:absolute;inset:0;background-size:cover;background-position:left center; /* was center — cropped baked-in left-side text evenly from both edges */
+}
+.wp-detail-img::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(0,0,0,0.45) 0%,rgba(0,0,0,0) 20%,rgba(0,0,0,0) 70%,rgba(0,0,0,0.55) 100%);
+}
+.wp-detail-back{
+  position:fixed;left:16px;top:calc(env(safe-area-inset-top,0px)+14px);z-index:62;
+  width:38px;height:38px;border-radius:50%;
+  background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.16);
+  backdrop-filter:blur(10px);color:#fff;font-size:16px;font-weight:700;
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.wp-detail-actions{
+  position:fixed;right:16px;bottom:calc(env(safe-area-inset-bottom,0px)+96px);z-index:62;
+  display:flex;flex-direction:column;gap:14px;align-items:center;
+}
+.wp-detail-quote{
+  position:fixed;left:32px;right:32px;bottom:calc(env(safe-area-inset-bottom,0px)+150px);z-index:62;
+  text-align:center;
+}
+.wp-detail-quote .wp-detail-line{display:block;width:28px;height:1px;background:rgba(255,255,255,.3);margin:0 auto 18px}
+.wp-detail-quote .wp-detail-text{
+  font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-weight:300;
+  font-size:clamp(22px,6.5vw,36px);line-height:1.35;color:#fff;margin-bottom:14px;
+  text-shadow:0 2px 10px rgba(0,0,0,0.5);
+}
+.wp-detail-quote .wp-detail-author{
+  font-size:11px;font-weight:400;letter-spacing:2.5px;text-transform:uppercase;color:rgba(255,255,255,.6);
+}
+.wp-detail-tag{
+  position:fixed;left:16px;bottom:calc(env(safe-area-inset-bottom,0px)+96px);z-index:62;
+  font-size:9px;font-weight:500;letter-spacing:2px;text-transform:uppercase;
+  color:rgba(255,255,255,.55);border:1px solid rgba(255,255,255,.18);
+  padding:5px 12px;border-radius:50px;backdrop-filter:blur(6px);
+}
+#wpViewDiscover.on, #wpViewGrid.on, #wpViewFav.on, #wpViewDownloads.on{
+  height:100dvh;overflow-y:auto;-webkit-overflow-scrolling:touch;
+}
+#wpBotNav{
+  position:fixed;bottom:0;left:0;right:0;z-index:60;
+  display:flex;background:rgba(8,8,16,0.94);backdrop-filter:blur(20px);
+  border-top:1px solid rgba(255,255,255,0.08);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.wp-tab{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  padding:10px 0 8px;color:rgba(255,255,255,0.4);cursor:pointer;
+}
+.wp-tab.on{color:#ffb347;filter:drop-shadow(0 0 6px rgba(255,179,71,0.45))}
+.wp-tab svg{width:20px;height:20px}
+.wp-tab-lb{font-size:9.5px;font-weight:700;letter-spacing:.6px;text-transform:uppercase}
+
+#wpViewGrid, #wpViewFav, #wpViewDownloads{
+  min-height:100vh;background:#080810;padding:56px 16px 90px;
+}
+.wp-grid-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.wp-back-link{font-size:14px;font-weight:600;color:#ffb347;cursor:pointer;flex-shrink:0}
+.wp-grid-title{font-family:'Cormorant Garamond',Georgia,serif;font-style:italic;font-size:20px;color:#fff;text-transform:capitalize;text-align:center;flex:1}
+.wp-sort{position:relative;display:flex;align-items:center;gap:5px;font-size:13px;font-weight:600;color:#ffb347;cursor:pointer;flex-shrink:0}
+.wp-sort svg{width:15px;height:15px}
+.wp-sort-menu{
+  position:absolute;top:26px;right:0;z-index:70;min-width:160px;
+  background:var(--ink2);border:1px solid var(--wire2);border-radius:12px;
+  padding:6px;box-shadow:0 12px 30px rgba(0,0,0,0.5);
+  display:none;
+}
+.wp-sort-menu.on{display:block}
+.wp-sort-opt{
+  padding:9px 12px;border-radius:8px;font-size:12.5px;font-weight:600;
+  color:var(--snow2);text-transform:none;letter-spacing:0;cursor:pointer;white-space:nowrap;
+}
+.wp-sort-opt:hover{background:var(--ink3)}
+.wp-sort-opt.active{color:#ffb347;background:rgba(255,179,71,0.12)}
+.wp-cat-pills{display:flex;gap:8px;overflow-x:auto;margin-bottom:16px;padding-bottom:4px}
+.wp-cat-pills::-webkit-scrollbar{display:none}
+.wp-pill{
+  flex-shrink:0;padding:7px 16px;border-radius:50px;border:1px solid rgba(255,255,255,0.15);
+  font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:rgba(255,255,255,0.6);
+  white-space:nowrap;cursor:pointer;
+}
+.wp-pill.on{border-color:#ffb347;color:#ffb347}
+
+/* ══════════════════════════════════
+   DISCOVER HOME — gallery-style browse screen
+══════════════════════════════════ */
+#wpViewDiscover{
+  min-height:100vh;background:var(--ink);padding:22px 18px 100px;
+  font-family:var(--sans);
+}
+.wpd-header{display:flex;justify-content:flex-start;align-items:center;margin-bottom:22px;gap:14px}
+.wpd-back-btn{
+  flex-shrink:0;width:38px;height:38px;border-radius:50%;
+  background:var(--ink2);border:1px solid var(--wire2);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--snow);font-size:16px;cursor:pointer;
+}
+.wpd-title{font-family:var(--serif);font-weight:800;font-size:32px;letter-spacing:-.01em;color:var(--snow);line-height:1}
+.wpd-tagline{font-size:12.5px;color:var(--snow2);margin-top:6px}
+.wpd-tagline b{color:var(--amber);font-weight:600}
+.wpd-cta-btn{
+  flex-shrink:0;display:flex;align-items:center;gap:6px;
+  background:var(--grad-a);color:#1a0d05;
+  font-size:12px;font-weight:700;padding:10px 16px;border-radius:50px;
+  white-space:nowrap;cursor:pointer;box-shadow:0 4px 18px rgba(255,107,157,0.25);
+}
+
+.wpd-section{margin-bottom:26px}
+.wpd-section-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.wpd-section-title{font-family:var(--serif);font-weight:700;font-size:19px;color:var(--snow);display:flex;align-items:center;gap:8px}
+.wpd-live-dot{width:7px;height:7px;border-radius:50%;background:var(--rose);animation:wpdPulse 1.6s ease infinite}
+@keyframes wpdPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(1.3)}}
+.wpd-see-all{font-size:12px;font-weight:600;color:var(--amber);display:flex;align-items:center;gap:4px;cursor:pointer}
+
+/* Featured collections — large rounded cards, horizontal scroll */
+.wpd-collections{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px;scroll-snap-type:x proximity}
+.wpd-collections::-webkit-scrollbar{display:none}
+.wpd-coll-card{
+  flex-shrink:0;width:118px;height:150px;border-radius:20px;
+  background-size:cover;background-position:center;
+  position:relative;overflow:hidden;scroll-snap-align:start;
+  border:1px solid var(--wire2);cursor:pointer;
+  box-shadow:0 6px 22px rgba(0,0,0,0.4);
+}
+.wpd-coll-card::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.75) 0%,rgba(0,0,0,0) 55%);
+}
+.wpd-coll-badge{
+  position:absolute;top:8px;right:8px;z-index:2;
+  background:var(--grad-a);color:#1a0d05;font-size:8.5px;font-weight:800;
+  padding:2px 7px;border-radius:50px;letter-spacing:.4px;
+}
+.wpd-coll-name{
+  position:absolute;bottom:10px;left:10px;right:10px;z-index:2;
+  font-family:var(--serif);font-weight:700;font-size:14px;color:#fff;text-transform:capitalize;
+}
+
+/* Category chip nav */
+.wpd-cats{display:flex;gap:22px;overflow-x:auto;padding-bottom:10px;margin-bottom:22px;border-bottom:1px solid var(--wire)}
+.wpd-cats::-webkit-scrollbar{display:none}
+.wpd-cat{
+  flex-shrink:0;font-size:14px;font-weight:600;color:var(--fog);
+  padding-bottom:10px;position:relative;cursor:pointer;text-transform:capitalize;
+  white-space:nowrap;
+}
+.wpd-cat.on{color:var(--amber)}
+.wpd-cat.on::after{
+  content:'';position:absolute;left:0;right:0;bottom:-1px;height:2px;
+  background:var(--grad-a);border-radius:2px;
+}
+
+/* Portrait row — used for New + Popular sections */
+.wpd-row{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
+.wpd-row::-webkit-scrollbar{display:none}
+.wpd-pcard{
+  flex-shrink:0;width:130px;aspect-ratio:9/16;border-radius:18px;
+  background-size:cover;background-position:center;
+  position:relative;overflow:hidden;cursor:pointer;
+  border:1px solid var(--wire2);box-shadow:0 6px 20px rgba(0,0,0,0.35);
+}
+.wpd-pcard::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(to top,rgba(0,0,0,.55) 0%,rgba(0,0,0,0) 45%);
+}
+.wpd-pcard-badge{
+  position:absolute;top:8px;left:8px;z-index:2;
+  display:flex;align-items:center;gap:4px;
+  background:rgba(8,8,16,0.55);backdrop-filter:blur(6px);
+  color:#fff;font-size:8.5px;font-weight:700;letter-spacing:.3px;text-transform:uppercase;
+  padding:3px 8px;border-radius:50px;
+}
+.wpd-pcard-heart{
+  position:absolute;top:8px;right:8px;z-index:2;font-size:13px;
+  background:rgba(8,8,16,0.55);backdrop-filter:blur(6px);
+  width:24px;height:24px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+}
+.wpd-pcard-tag{
+  position:absolute;bottom:8px;left:8px;right:8px;z-index:2;
+  font-size:10px;font-weight:700;color:rgba(255,255,255,.85);text-transform:uppercase;letter-spacing:.4px;
+}
+
+/* Premium CTA (links to real premium content — Learning Hub) */
+.wpd-premium{
+  display:flex;align-items:center;justify-content:space-between;gap:10px;
+  background:var(--grad-d);
+  border-radius:50px;padding:14px 20px;margin:6px 0 26px;
+  cursor:pointer;box-shadow:0 8px 26px rgba(192,132,252,0.22);
+}
+.wpd-premium-txt{font-size:13.5px;font-weight:700;color:#1a0d05;display:flex;align-items:center;gap:8px}
+.wpd-premium-arrow{color:#1a0d05;font-size:15px;font-weight:800}
+
+.wpd-empty{color:var(--fog);font-size:13px;padding:20px 0;text-align:center}
+
+/* Reel close button (shown when opened from Discover) */
+#wpReelClose{
+  position:fixed;top:calc(env(safe-area-inset-top,0px) + 16px);left:16px;z-index:80;
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(8,8,16,0.55);backdrop-filter:blur(8px);
+  display:flex;align-items:center;justify-content:center;
+  color:#fff;font-size:16px;cursor:pointer;
+}
+.wp-card-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.wp-card{
+  position:relative;border-radius:12px;overflow:hidden;aspect-ratio:9/16;
+  background-size:cover;background-position:center;cursor:pointer;
+}
+.wp-card::after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,rgba(0,0,0,0.15) 0%,rgba(0,0,0,0.1) 45%,rgba(0,0,0,0.85) 100%)}
+.wp-card-heart{
+  position:absolute;top:6px;right:6px;z-index:2;width:22px;height:22px;
+  display:flex;align-items:center;justify-content:center;font-size:12px;
+}
+.wp-card-bottom{position:absolute;left:7px;right:7px;bottom:6px;z-index:2}
+.wp-card-tag{font-size:8.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:#fff;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.wp-card-quote{
+  position:absolute;left:7px;right:7px;bottom:26px;z-index:2;
+  font-family:'Fraunces',Georgia,serif;font-style:italic;font-size:10.5px;line-height:1.3;
+  color:rgba(255,255,255,0.92);
+  display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;
+  text-shadow:0 1px 4px rgba(0,0,0,0.6);
+}
+.wp-card-meta{display:flex;justify-content:space-between;align-items:center;margin-top:2px}
+.wp-card-dim{font-size:8px;color:rgba(255,255,255,0.55)}
+.wp-card-dl{font-size:12px;color:#ffb347}
+.wp-empty{grid-column:1/-1;text-align:center;padding:60px 20px;color:rgba(255,255,255,0.35);font-size:12.5px}
+
+/* ── Responsive: tablet / desktop widen the grid + horizontal cards
+   rather than just stretching the mobile layout ── */
+@media (min-width:640px){
+  .wp-card-grid{grid-template-columns:repeat(4,1fr);gap:12px}
+  .wpd-coll-card{width:150px;height:190px}
+  .wpd-pcard{width:160px}
+  #wpViewDiscover, #wpViewGrid, #wpViewFav, #wpViewDownloads{padding-left:32px;padding-right:32px}
+}
+@media (min-width:1000px){
+  .wp-card-grid{grid-template-columns:repeat(6,1fr);gap:16px}
+  #wpViewDiscover, #wpViewGrid, #wpViewFav, #wpViewDownloads{padding-left:64px;padding-right:64px;max-width:1400px;margin:0 auto}
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+</head>
+<body class="wp-checking">
+
+<div id="wpLockGate">
+  <div class="wp-lock-icon">🔒</div>
+  <div class="wp-lock-title">Unlock a lesson first</div>
+  <div class="wp-lock-sub">Wallpapers are unlocked once you've completed at least one wisdom lesson. Go finish one to get access.</div>
+  <div class="wp-lock-btn" onclick="location.href='index.html#learn'">Explore Lessons</div>
+  <div class="wp-lock-back" onclick="location.href='index.html'">← Back home</div>
+</div>
+
+<!-- ══════════════════════════════════
+     DISCOVER — gallery-style landing screen
+══════════════════════════════════ -->
+<div id="wpViewDiscover" class="wp-view on">
+  <div class="wpd-header">
+    <div class="wpd-back-btn" onclick="location.href='index.html'">←</div>
+    <div>
+      <div class="wpd-title">Wallpapers</div>
+      <div class="wpd-tagline">Daily wisdom. <b>Perfect fit.</b></div>
+    </div>
+    <!-- TODO: re-add a CTA button here when AdSense/premium is ready. Was: ✦ Premium Lessons -->
+  </div>
+
+  <div class="wpd-section">
+    <div class="wpd-section-head">
+      <div class="wpd-section-title">Featured Collections</div>
+    </div>
+    <div class="wpd-collections" id="wpdCollections"></div>
+  </div>
+
+  <div class="wpd-cats" id="wpdCats"></div>
+
+  <div class="wpd-section">
+    <div class="wpd-section-head">
+      <div class="wpd-section-title"><span class="wpd-live-dot"></span> New</div>
+      <div class="wpd-see-all" onclick="navigateTo('#grid-new')">See All →</div>
+    </div>
+    <div class="wpd-row" id="wpdNew"></div>
+  </div>
+
+  <!-- One horizontally-scrollable section per real category, built from
+       the site's own wallpaper data — see renderDiscoverCategorySections() -->
+  <div id="wpdCatSections"></div>
+
+  <!-- TODO: re-add the premium CTA banner here when AdSense/premium is ready. Was:
+  <div class="wpd-premium" onclick="location.href='index.html#learn'">
+    <div class="wpd-premium-txt">✦ Unlock Premium Wisdom Lessons</div>
+    <div class="wpd-premium-arrow">→</div>
+  </div>
+  -->
+</div><!-- /wpViewDiscover -->
+
+<div id="wpViewReel" class="wp-view">
+<div id="wpReelClose" onclick="navigateTo('#home')">✕</div>
+<div id="counter">1 / 14</div>
+<div id="dots"></div>
+<div class="swipe-hint" id="swipeHint">↑ scroll to explore ↓</div>
+
+<div id="reel">
+</div><!-- /reel -->
+</div><!-- /wpViewReel -->
+
+<!-- ══════════════════════════════════
+     SINGLE WALLPAPER DETAIL — static page, no swipe.
+     Just this one wallpaper + quote/tag + Back / Save / Download.
+══════════════════════════════════ -->
+<div id="wpViewDetail" class="wp-view">
+  <div class="wp-detail-back" onclick="history.back()">←</div>
+  <div class="wp-detail-img" id="wpDetailImg"></div>
+  <div class="wp-detail-quote" id="wpDetailQuote" style="display:none">
+    <span class="wp-detail-line"></span>
+    <div class="wp-detail-text" id="wpDetailText"></div>
+    <div class="wp-detail-author" id="wpDetailAuthor"></div>
+  </div>
+  <div class="wp-detail-tag" id="wpDetailTag" style="display:none"></div>
+  <div class="wp-detail-actions">
+    <div class="action-btn" id="wpDetailSave" title="Save"></div>
+    <div class="action-btn" id="wpDetailDownload" title="Download">⬇️</div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════
+     GRID BROWSE VIEW
+══════════════════════════════════ -->
+<div id="wpViewGrid" class="wp-view">
+  <div class="wp-grid-head">
+    <div class="wp-back-link" onclick="navigateTo('#home')">← Back</div>
+    <div class="wp-grid-title" id="wpGridTitle">All Wallpapers</div>
+    <div class="wp-sort" onclick="wpToggleSortMenu(event)">
+      Sort
+      <svg id="wpSortIcon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7h18M6 12h12M10 17h4"/></svg>
+      <div class="wp-sort-menu" id="wpSortMenu" onclick="event.stopPropagation()">
+        <div class="wp-sort-opt active" data-sort="default" onclick="wpSetSort('default')">Default</div>
+        <div class="wp-sort-opt" data-sort="newest" onclick="wpSetSort('newest')">Newest First</div>
+        <div class="wp-sort-opt" data-sort="oldest" onclick="wpSetSort('oldest')">Oldest First</div>
+      </div>
+    </div>
+  </div>
+  <div class="wp-cat-pills" id="wpCatPills"></div>
+  <div class="wp-card-grid" id="wpGridAll"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     FAVORITES VIEW
+══════════════════════════════════ -->
+<div id="wpViewFav" class="wp-view">
+  <div class="wp-grid-head"><div class="wp-grid-title">Favorites</div></div>
+  <div class="wp-card-grid" id="wpGridFav"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     DOWNLOADS VIEW
+══════════════════════════════════ -->
+<div id="wpViewDownloads" class="wp-view">
+  <div class="wp-grid-head"><div class="wp-grid-title">Downloads</div></div>
+  <div class="wp-card-grid" id="wpGridDownloads"></div>
+</div>
+
+<!-- ══════════════════════════════════
+     BOTTOM NAV
+══════════════════════════════════ -->
+<nav id="wpBotNav">
+  <div class="wp-tab on" id="wpTabHome" onclick="navigateTo('#home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/></svg>
+    <div class="wp-tab-lb">Home</div>
+  </div>
+  <div class="wp-tab" id="wpTabGrid" onclick="navigateTo('#grid')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+    <div class="wp-tab-lb">Wallpapers</div>
+  </div>
+  <div class="wp-tab" id="wpTabFav" onclick="navigateTo('#fav')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg>
+    <div class="wp-tab-lb">Favorites</div>
+  </div>
+  <div class="wp-tab" id="wpTabDownloads" onclick="navigateTo('#downloads')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+    <div class="wp-tab-lb">Downloads</div>
+  </div>
+</nav>
+
+<canvas id="dlCanvas"></canvas>
+<div id="toast"></div>
+<div id="netBanner">
+  <div class="nb-msg">⚠️ Network problem — some wallpapers couldn't load. Check your connection.</div>
+  <div class="nb-retry" onclick="retryWallpaperLoad()">Retry</div>
+</div>
+
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAKMI3LZwlPO-VungZEz3T8_eNwbuSBfhw",
+  authDomain: "daniel-wisdom-hub.firebaseapp.com",
+  projectId: "daniel-wisdom-hub",
+  storageBucket: "daniel-wisdom-hub.firebasestorage.app",
+  messagingSenderId: "911988639155",
+  appId: "1:911988639155:web:e1b781c3054734536c77c6",
+};
+firebase.initializeApp(firebaseConfig);
+const wallDb = firebase.firestore();
+const wallAuth = firebase.auth();
+
+let wallCatCovers = {}; // wallpaper category custom covers, synced live from Firestore
+wallDb.collection('catCovers').onSnapshot(snap => {
+  const covers = {};
+  snap.forEach(doc => { covers[doc.id] = (doc.data()||{}).img || ''; });
+  wallCatCovers = covers;
+  if (typeof renderDiscoverHome === 'function') renderDiscoverHome();
+}, err => console.error('[Firebase] catCovers listener failed', err));
+function wallSlugifyKey(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+/* ── Lesson-unlock gate ──
+   Same anonymous account used on index.html (shared auth/localStorage on
+   this origin), so a visitor's unlock progress carries over here. Anyone
+   with 0 unlocked lessons gets the lock screen instead of the app; 1+
+   unlocked and they pass straight through with no message. */
+wallAuth.onAuthStateChanged(user => {
+  if (user) {
+    checkWallpaperAccess(user.uid);
+  } else {
+    wallAuth.signInAnonymously().catch(err => {
+      console.error('[Firebase] anon sign-in failed', err);
+      document.body.classList.remove('wp-checking'); // fail open rather than stuck blank
+    });
+  }
+});
+function checkWallpaperAccess(uid){
+  wallDb.collection('users').doc(uid).onSnapshot(doc => {
+    const data = doc.data();
+    const unlocked = (data && data.unlockedTopics) || [];
+    document.body.classList.remove('wp-checking');
+    document.body.classList.toggle('wp-locked', unlocked.length < 1);
+  }, err => {
+    console.error('[Firebase] user listener failed', err);
+    document.body.classList.remove('wp-checking'); // fail open on error
+  });
+}
+
+/* ══════════════════════════════════
+   SLIDES & DOTS
+══════════════════════════════════ */
+const reel   = document.getElementById('reel');
+const dotsEl = document.getElementById('dots');
+const counter= document.getElementById('counter');
+const hint   = document.getElementById('swipeHint');
+let   slides = document.querySelectorAll('.slide');
+let   total  = slides.length;
+// All wallpapers now live in Firestore (nothing hardcoded here anymore), so
+// there's no "static vs newly-added" distinction to make — every slide is
+// on equal footing. Setting this to Infinity means the "isNew"/"New" badge
+// and filter simply stay off rather than flagging every wallpaper as new.
+const STATIC_TOTAL = Infinity;
+let   cur    = 0;
+let   saved  = new Set(JSON.parse(localStorage.getItem('dwh_wall_saved')||'[]'));
+
+let reelVisible = []; // real data-idx values currently visible in the reel, in order
+
+function setupReel() {
+  slides.forEach(s => {
+    io.observe(s);
+    const idx = parseInt(s.dataset.idx);
+    if (saved.has(idx)) {
+      const btn = s.querySelector('.action-btn');
+      if (btn) btn.classList.add('saved');
+    }
+  });
+  applyReelFilter('all');
+  buildWPItems();
+}
+
+/* Show only the slides matching `cat` inside the reel (or all, if 'all'),
+   and rebuild the dots/counter to match — so swiping through a category
+   stays inside that category instead of spilling into everything. */
+function applyReelFilter(cat){
+  reelVisible = [];
+  slides.forEach(s => {
+    const idx = parseInt(s.dataset.idx);
+    const tag = (s.querySelector('.slide-tag')?.innerText || 'Motivation').trim().toLowerCase();
+    const show = cat==='all' || (cat==='new' ? idx >= STATIC_TOTAL : tag===cat);
+    s.classList.toggle('wp-hidden', !show);
+    if (show) reelVisible.push(idx);
+  });
+  dotsEl.innerHTML = '';
+  reelVisible.forEach((realIdx, pos) => {
+    const d = document.createElement('div');
+    d.className = 'dot' + (pos===0 ? ' on' : '');
+    d.onclick   = () => goTo(realIdx);
+    dotsEl.appendChild(d);
+  });
+  cur = reelVisible[0];
+  counter.textContent = '1 / ' + reelVisible.length;
+  slides.forEach(s => s.classList.remove('active'));
+  document.querySelector(`.slide[data-idx="${cur}"]`)?.classList.add('active');
+}
+
+/* ══════════════════════════════════
+   BOTTOM NAV + GRID BROWSE
+══════════════════════════════════ */
+let WP_ITEMS = [];
+let downloaded = new Set(JSON.parse(localStorage.getItem('dwh_wall_downloaded')||'[]'));
+/* ══════════════════════════════════
+   ROUTER — one source of truth for view + category, backed by the URL hash
+   so the back button and deep links (?category=Pain) both work correctly.
+   Hash formats: #home | #grid | #grid-<cat> | #fav | #downloads | #reel-<idx>
+══════════════════════════════════ */
+let wpCurCat = 'all';
+let wpSortDir = 'default'; // 'default' | 'newest'
+
+/* Normalize a tag so "solitude", "Solitude", " SOLITUDE " etc. are always
+   treated as the exact same category everywhere in the app — regardless
+   of how it was typed in admin. This is the ONE place tag casing is
+   decided; every section, pill, and collection downstream just uses
+   whatever this returns, so they can never drift apart into duplicates. */
+function normalizeTag(raw){
+  return (raw || 'Motivation')
+    .trim()
+    .replace(/\s+/g, ' ')
+    .replace(/\w\S*/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase());
+}
+
+function buildWPItems(){
+  WP_ITEMS = [...slides].map(s => {
+    const idx = parseInt(s.dataset.idx);
+    const bgEl = s.querySelector('.slide-bg');
+    // Always the original raw Cloudinary URL — every render site below
+    // (grid/detail/rows) derives its own right-sized version from this
+    // via cldUrl(), so nothing displays the multi-MB original by accident.
+    const bg = bgEl.dataset.raw || bgEl.style.backgroundImage.match(/url\(['"]?(.+?)['"]?\)/)?.[1] || '';
+    const tag = normalizeTag(s.querySelector('.slide-tag')?.innerText);
+    const quote = (s.querySelector('.slide-text')?.innerText || '').trim();
+    const author = (s.querySelector('.slide-author')?.innerText || '').trim();
+    return { idx, bg, tag, quote, author, isNew: idx >= STATIC_TOTAL };
+  });
+  renderCatPills();
+
+  let gridItems = wpCurCat==='new'
+    ? WP_ITEMS.filter(i => i.isNew)
+    : WP_ITEMS.filter(i => wpCurCat==='all' || i.tag.toLowerCase()===wpCurCat);
+  if (wpSortDir === 'newest') gridItems = [...gridItems].sort((a,b) => b.idx - a.idx);
+  else if (wpSortDir === 'oldest') gridItems = [...gridItems].sort((a,b) => a.idx - b.idx);
+  renderGrid('wpGridAll', gridItems);
+
+  const titleEl = document.getElementById('wpGridTitle');
+  if (titleEl) titleEl.textContent = wpCurCat==='all' ? 'All Wallpapers' : (wpCurCat==='new' ? 'New' : wpCurCat);
+
+  renderGrid('wpGridFav', WP_ITEMS.filter(i => saved.has(i.idx)));
+  renderGrid('wpGridDownloads', WP_ITEMS.filter(i => downloaded.has(i.idx)));
+  renderDiscoverHome();
+}
+
+/* Real, honest sort options only — backed by actual add-order (idx),
+   no fabricated "popularity"/"download count" metrics. */
+function wpToggleSortMenu(e){
+  e.stopPropagation();
+  document.getElementById('wpSortMenu').classList.toggle('on');
+}
+document.addEventListener('click', () => {
+  document.getElementById('wpSortMenu')?.classList.remove('on');
+});
+function wpSetSort(mode){
+  wpSortDir = mode; // 'default' | 'newest' | 'oldest'
+  document.querySelectorAll('.wp-sort-opt').forEach(o => o.classList.toggle('active', o.dataset.sort === mode));
+  document.getElementById('wpSortIcon').style.transform = mode === 'oldest' ? 'scaleY(-1)' : 'none';
+  document.getElementById('wpSortMenu').classList.remove('on');
+  buildWPItems();
+}
+
+function renderCatPills(){
+  const cats = ['all', ...new Set(WP_ITEMS.map(i=>i.tag.toLowerCase()))];
+  document.getElementById('wpCatPills').innerHTML = cats.map(c =>
+    `<div class="wp-pill ${c===wpCurCat?'on':''}" onclick="navigateTo('${c==='all'?'#grid':'#grid-'+c}')">${c}</div>`
+  ).join('');
+}
+
+function renderGrid(containerId, items){
+  const el = document.getElementById(containerId);
+  if (!items.length){ el.innerHTML = `<div class="wp-empty">Nothing here yet.</div>`; return; }
+  el.innerHTML = items.map(i => `
+    <div class="wp-card" data-bg="${cldUrl(i.bg,'f_auto,q_auto,w_400')}" onclick="navigateTo('#detail-${i.idx}')">
+      <div class="wp-card-heart" onclick="event.stopPropagation();wpToggleFav(${i.idx})">${saved.has(i.idx)?'❤️':'🤍'}</div>
+      ${i.quote ? `<div class="wp-card-quote">${i.quote.split('\n').join(' ')}</div>` : ''}
+      <div class="wp-card-bottom">
+        <div class="wp-card-tag">${i.tag}</div>
+        <div class="wp-card-meta">
+          <div class="wp-card-dim">1080 × 1920</div>
+          <div class="wp-card-dl" onclick="event.stopPropagation();wpDownload(${i.idx})">⬇️</div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+  lazyObserveCards(el, '.wp-card');
+}
+
+/* ══════════════════════════════════
+   DISCOVER HOME — featured collections, categories, new, popular
+   (uses the same wpCurCat as the grid, so the highlighted category always
+   matches wherever the user actually is)
+══════════════════════════════════ */
+function renderDiscoverHome(){
+  if (!WP_ITEMS.length) return;
+
+  // ── Featured Collections: custom admin cover if set, else the first wallpaper in that tag ──
+  const byTag = {};
+  WP_ITEMS.forEach(i => { if (!byTag[i.tag]) byTag[i.tag] = i; });
+  const collections = Object.keys(byTag);
+  document.getElementById('wpdCollections').innerHTML = collections.map((tag, n) => {
+    const customCover = wallCatCovers['wallpaper_'+wallSlugifyKey(tag)];
+    const bg = customCover || byTag[tag].bg;
+    return `
+    <div class="wpd-coll-card" data-bg="${cldUrl(bg,'f_auto,q_auto,w_400')}" onclick="navigateTo('#grid-${tag.toLowerCase()}')">
+      ${n < 2 ? '<div class="wpd-coll-badge">NEW</div>' : ''}
+      <div class="wpd-coll-name">${tag}</div>
+    </div>`;
+  }).join('');
+  lazyObserveCards(document.getElementById('wpdCollections'), '.wpd-coll-card');
+
+  // ── Category chips ──
+  const cats = ['all', ...collections.map(c=>c.toLowerCase())];
+  document.getElementById('wpdCats').innerHTML = cats.map(c =>
+    `<div class="wpd-cat ${c===wpCurCat?'on':''}" onclick="navigateTo('${c==='all'?'#grid':'#grid-'+c}')">${c}</div>`
+  ).join('');
+
+  renderDiscoverRows();
+  renderDiscoverCategorySections();
+}
+
+/* One horizontally-scrollable row per real category that actually has
+   wallpapers — each with a working "See All →" that opens that exact
+   category's grid page. Categories with no wallpapers are simply never
+   rendered here (the grid page itself shows the empty state if someone
+   deep-links to one directly). */
+function renderDiscoverCategorySections(){
+  const container = document.getElementById('wpdCatSections');
+  if (!container) return;
+  const byTag = {};
+  WP_ITEMS.forEach(i => { (byTag[i.tag] = byTag[i.tag] || []).push(i); });
+  const tags = Object.keys(byTag);
+
+  container.innerHTML = tags.map(tag => {
+    const items = byTag[tag].slice(0, 10);
+    return `
+    <div class="wpd-section">
+      <div class="wpd-section-head">
+        <div class="wpd-section-title">${tag}</div>
+        <div class="wpd-see-all" onclick="navigateTo('#grid-${tag.toLowerCase()}')">See All →</div>
+      </div>
+      <div class="wpd-row">
+        ${items.map(i => `
+          <div class="wpd-pcard" data-bg="${cldUrl(i.bg,'f_auto,q_auto,w_300')}" onclick="navigateTo('#detail-${i.idx}')">
+            <div class="wpd-pcard-heart" onclick="event.stopPropagation();wpToggleFav(${i.idx})">${saved.has(i.idx)?'❤️':'🤍'}</div>
+          </div>
+        `).join('')}
+      </div>
+    </div>`;
+  }).join('');
+  lazyObserveCards(container, '.wpd-pcard');
+}
+
+function renderDiscoverRows(){
+  // "New" — most recently admin-added wallpapers first, falling back to the rest
+  const newest = [...WP_ITEMS].sort((a,b) => (b.isNew - a.isNew) || (b.idx - a.idx)).slice(0, 8);
+  document.getElementById('wpdNew').innerHTML = newest.length ? newest.map(i => `
+    <div class="wpd-pcard" data-bg="${cldUrl(i.bg,'f_auto,q_auto,w_300')}" onclick="navigateTo('#detail-${i.idx}')">
+      <div class="wpd-pcard-badge">${i.isNew ? '✦ New' : i.tag}</div>
+      <div class="wpd-pcard-heart" onclick="event.stopPropagation();wpToggleFav(${i.idx})">${saved.has(i.idx)?'❤️':'🤍'}</div>
+      <div class="wpd-pcard-tag">${i.tag}</div>
+    </div>
+  `).join('') : `<div class="wpd-empty">Nothing here yet.</div>`;
+  lazyObserveCards(document.getElementById('wpdNew'), '.wpd-pcard');
+}
+
+function wpToggleFav(idx){
+  const slide = document.querySelector(`.slide[data-idx="${idx}"]`);
+  const btn = slide?.querySelector('.action-btn[title="Save"]');
+  if (btn) saveWall(btn);
+  buildWPItems();
+}
+function wpDownload(idx){
+  const slide = document.querySelector(`.slide[data-idx="${idx}"]`);
+  const btn = slide?.querySelector('.action-btn[title="Download"]');
+  if (btn) downloadWall(btn);
+}
+
+/* ── Show/hide the actual view elements + bottom-nav highlight for a given tab ── */
+function showWPTab(tab, extra){
+  document.getElementById('wpViewReel').classList.toggle('on', tab==='reel');
+  document.getElementById('wpViewDetail').classList.toggle('on', tab==='detail');
+  ['home','grid','fav','downloads'].forEach(id=>{
+    const viewId = id==='home' ? 'wpViewDiscover' : 'wpView'+id.charAt(0).toUpperCase()+id.slice(1);
+    document.getElementById(viewId).classList.toggle('on', tab!=='reel' && tab!=='detail' && id===tab);
+    document.getElementById('wpTab'+(id==='grid'?'Grid':id.charAt(0).toUpperCase()+id.slice(1))).classList.toggle('on', tab!=='reel' && tab!=='detail' && id===tab);
+  });
+  if (tab==='grid'||tab==='fav'||tab==='downloads') buildWPItems();
+}
+
+/* ── Render the static single-wallpaper detail page for one idx ──
+   No swiping — just the image, its quote/author/tag, and Save/Download,
+   all backed by the exact same saved/downloaded state used everywhere
+   else in the app (via the hidden .slide element). */
+function renderDetail(idx){
+  const item = WP_ITEMS.find(i => i.idx === idx);
+  if (!item) return;
+  document.getElementById('wpDetailImg').style.backgroundImage = `url('${cldUrl(item.bg,'f_auto,q_auto,w_1080')}')`;
+
+  const quoteEl = document.getElementById('wpDetailQuote');
+  if (item.quote) {
+    document.getElementById('wpDetailText').innerHTML = item.quote.replace(/\n/g, '<br>');
+    document.getElementById('wpDetailAuthor').textContent = item.author ? '— ' + item.author : '';
+    quoteEl.style.display = '';
+  } else {
+    quoteEl.style.display = 'none';
+  }
+
+  const tagEl = document.getElementById('wpDetailTag');
+  if (item.tag) {
+    tagEl.textContent = item.tag;
+    tagEl.style.display = '';
+  } else {
+    tagEl.style.display = 'none';
+  }
+
+  const saveBtn = document.getElementById('wpDetailSave');
+  saveBtn.textContent = saved.has(idx) ? '❤️' : '🤍';
+  saveBtn.onclick = () => {
+    wpToggleFav(idx);
+    saveBtn.textContent = saved.has(idx) ? '❤️' : '🤍';
+  };
+
+  const dlBtn = document.getElementById('wpDetailDownload');
+  dlBtn.textContent = '⬇️';
+  dlBtn.onclick = () => wpDownload(idx);
+}
+
+/* ── Parse a hash like "#grid-pain" or "#reel-12" and render that state ── */
+function applyRoute(hash){
+  hash = (hash || '#home').replace(/^#/, '');
+  const [tab, arg] = hash.split('-', 2);
+
+  if (tab === 'reel') {
+    const idx = parseInt(arg);
+    // Filter the reel to match the category context — but never hide the
+    // wallpaper actually being opened (e.g. tapping a Finance card from the
+    // "New" row, which spans every category, while wpCurCat is stale from a
+    // previous filtered view).
+    const targetEl = document.querySelector(`.slide[data-idx="${idx}"]`);
+    const targetTag = (targetEl?.querySelector('.slide-tag')?.innerText || 'motivation').trim().toLowerCase();
+    const targetIsNew = idx >= STATIC_TOTAL;
+    let filterCat = 'all';
+    if (wpCurCat === 'all') filterCat = 'all';
+    else if (wpCurCat === 'new') filterCat = targetIsNew ? 'new' : targetTag;
+    else filterCat = (wpCurCat === targetTag) ? wpCurCat : targetTag;
+    applyReelFilter(filterCat);
+    showWPTab('reel');
+    setTimeout(()=>goTo(idx), 50);
+    return;
+  }
+
+  if (tab === 'detail') {
+    renderDetail(parseInt(arg));
+    showWPTab('detail');
+    return;
+  }
+
+  if (tab === 'grid') {
+    wpCurCat = arg || 'all';
+  } else if (tab !== 'home') {
+    wpCurCat = 'all';
+  }
+
+  showWPTab(['home','grid','fav','downloads'].includes(tab) ? tab : 'home');
+  if (tab === 'home') renderDiscoverHome(); // reflect wpCurCat highlight even if unchanged
+}
+
+/* ── Push a new hash + render it (use this from onclick handlers) ── */
+function navigateTo(hash){
+  if (location.hash === hash) { applyRoute(hash); return; }
+  history.pushState(null, '', hash);
+  applyRoute(hash);
+}
+
+window.addEventListener('popstate', () => applyRoute(location.hash));
+
+// Back-compat wrappers, in case anything else in the file still calls the old names
+function goWPView(v){ navigateTo(v==='home' ? '#home' : '#'+v); }
+function wpOpenSlide(idx){ navigateTo('#detail-'+idx); }
+
+function goTo(idx) {
+  const el = document.querySelector(`.slide[data-idx="${idx}"]`);
+  if (el) el.scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function setActive(idx) {
+  if (idx === cur) return;
+  document.querySelector(`.slide[data-idx="${cur}"]`)?.classList.remove('active');
+  cur = idx;
+  document.querySelector(`.slide[data-idx="${cur}"]`)?.classList.add('active');
+  const pos = reelVisible.indexOf(idx);
+  dotsEl.querySelectorAll('.dot').forEach((d,i) => d.classList.toggle('on', i===pos));
+  counter.textContent = (pos+1) + ' / ' + reelVisible.length;
+  if (pos > 0) hint.style.opacity = '0';
+}
+
+// Intersection Observer for active slide
+const io = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      const idx = parseInt(e.target.dataset.idx);
+      setActive(idx);
+    }
+  });
+}, { root: reel, threshold: 0.55 });
+
+/* ══════════════════════════════════
+   CLOUDINARY RESIZING
+   Every image is currently stored (and rendered EVERYWHERE — reel,
+   grid thumbnails, discover cards) as the raw, full-resolution upload.
+   That's the #1 cause of slow image loads: a 3-6MB original gets
+   downloaded even for a 120px grid thumbnail. Cloudinary can resize +
+   compress on the fly just by inserting a transform segment into the
+   URL, so we ask for exactly the pixels each spot on screen needs.
+   The *original* raw URL is always kept (data-raw / item.bg) for
+   hi-res downloads — only what's visually displayed gets shrunk. ══*/
+function cldUrl(url, tx) {
+  if (!url || !/res\.cloudinary\.com/.test(url)) return url; // pasted non-Cloudinary URL — leave as-is
+  if (url.includes('/upload/' + tx + '/')) return url; // already transformed
+  return url.replace('/upload/', '/upload/' + tx + '/');
+}
+
+/* ── Append admin-added wallpapers from Firestore, then init the reel ── */
+function buildSlideEl(data, idx) {
+  const el = document.createElement('div');
+  el.className = 'slide';
+  el.dataset.idx = idx;
+  const hasQuote = !!(data.q && data.q.trim());
+  // Reel slides are near-fullscreen, so they get a real-quality resize
+  // (w_1080) rather than a thumbnail — but still f_auto,q_auto, which
+  // alone typically cuts file size 60-80% with no visible difference.
+  const displayUrl = cldUrl(data.url, 'f_auto,q_auto,w_1080');
+  el.innerHTML = `
+    <div class="slide-bg" data-raw="${data.url}" style="background-image:url('${displayUrl}')"></div>
+    <div class="slide-overlay"></div>
+    <div class="slide-brand">Daniel Wisdom Hub</div>
+    <div class="slide-quote" style="${hasQuote ? '' : 'display:none'}">
+      <span class="slide-line"></span>
+      <div class="slide-text">${(data.q||'').replace(/\n/g,'<br>')}</div>
+      <div class="slide-author">${data.a ? '— '+data.a : ''}</div>
+    </div>
+    <div class="slide-bottom">
+      <span class="slide-tag" style="${data.tag ? '' : 'display:none'}">${data.tag||''}</span>
+      <div class="slide-actions">
+        <div class="action-btn" onclick="saveWall(this)" title="Save">🔖</div>
+        <div class="action-btn" onclick="downloadWall(this)" title="Download">⬇️</div>
+      </div>
+    </div>`;
+  return el;
+}
+
+/* ── Self-served ad (see admin panel → Ads). Shown as a full-screen
+   interstitial gate before entering the reel — see AD GATE below —
+   never mixed into the swipeable content itself. ── */
+function openAdLink(url) {
+  if (!url) return;
+  window.open(url, '_blank', 'noopener');
+}
+
+/* ══════════════════════════════════
+   AD GATE — full-screen interstitial shown before the page's real
+   content, roughly every N visits (frequency set in admin panel →
+   Ads). "Continue to app" starts disabled with a spinner, then
+   becomes a tappable arrow once the real content is ready (and a
+   short minimum view time has passed) — tapping it reveals the
+   already-loaded page underneath.
+══════════════════════════════════ */
+function shouldShowAdGate(surfaceKey, freq) {
+  const key = 'adGateCount_' + surfaceKey;
+  const n = parseInt(localStorage.getItem(key) || '0', 10) + 1;
+  if (n >= freq) { localStorage.setItem(key, '0'); return true; }
+  localStorage.setItem(key, String(n));
+  return false;
+}
+function showAdGate(ad, readyPromise, onContinue) {
+  const safeLink = (ad.linkUrl || '').replace(/'/g, "\\'");
+  const displayUrl = cldUrl(ad.img, 'f_auto,q_auto,w_1080');
+  const gate = document.createElement('div');
+  gate.className = 'ad-gate';
+  gate.innerHTML = `
+    <div class="ad-gate-bar">
+      <div class="ad-gate-back" onclick="dismissAdGate()">←</div>
+      <div class="ad-gate-brand">
+        <div class="ad-gate-icon">🖼️</div>
+        <div class="ad-gate-name">Daniel Wisdom Hub</div>
+      </div>
+      <div class="ad-gate-continue" id="adGateContinue">
+        <span>Continue to app</span>
+        <div class="ad-gate-spinner"></div>
+      </div>
+    </div>
+    <div class="ad-gate-body" onclick="openAdLink('${safeLink}')">
+      <div class="ad-badge">${ad.label || 'Advertisement'}</div>
+      <div class="ad-gate-img" style="background-image:url('${displayUrl}')"></div>
+      <button class="ad-gate-cta" onclick="event.stopPropagation();openAdLink('${safeLink}')">${ad.cta || 'Get Yours Now'} →</button>
+    </div>`;
+  document.body.appendChild(gate);
+  document.body.style.overflow = 'hidden';
+  window._adGateOnContinue = onContinue;
+
+  const minDelay = new Promise(res => setTimeout(res, 1400));
+  Promise.all([readyPromise, minDelay]).then(() => {
+    const cont = document.getElementById('adGateContinue');
+    if (!cont) return; // gate already dismissed via back button
+    cont.innerHTML = '<span>Continue to app</span><span class="ad-gate-arrow">→</span>';
+    cont.classList.add('ready');
+    cont.onclick = dismissAdGate;
+  });
+}
+function dismissAdGate() {
+  const gate = document.querySelector('.ad-gate');
+  if (gate) gate.remove();
+  document.body.style.overflow = '';
+  const cb = window._adGateOnContinue;
+  window._adGateOnContinue = null;
+  if (cb) cb();
+}
+
+function loadAdminWallpapers() {
+  return wallDb.collection('wallpapers').orderBy('createdAt','desc').get()
+    .then(snap => {
+      let idx = total;
+      snap.forEach(doc => {
+        reel.appendChild(buildSlideEl(doc.data(), idx));
+        idx++;
+      });
+      slides = document.querySelectorAll('.slide');
+      total = slides.length;
+      hideNetBanner();
+    })
+    .catch(err => {
+      console.error('[Firebase] wallpapers fetch failed', err);
+      showNetBanner('⚠️ Network problem — some wallpapers couldn\'t load. Check your connection.');
+    })
+    .finally(() => {
+      skeletonizeSlides(document.querySelectorAll('.slide'));
+    });
+}
+
+function revealWallpaperPage(wallpapersReady) {
+  wallpapersReady.finally(() => {
+    setupReel();
+    // Deep-link support: wallpaper.html?category=Pain → same as tapping the Pain card
+    const params = new URLSearchParams(location.search);
+    const initCat = params.get('category');
+    const initialHash = location.hash || (initCat ? '#grid-'+initCat.toLowerCase() : '#home');
+    if (location.hash !== initialHash) history.replaceState(null, '', initialHash);
+    applyRoute(initialHash);
+  });
+}
+
+// Start loading real content immediately (in the background — it may
+// finish before the ad gate's minimum view time, which is the point).
+const _wallpapersReady = loadAdminWallpapers();
+Promise.all([
+  wallDb.collection('ads').where('active','==',true).get().catch(()=>({docs:[]})),
+  wallDb.collection('settings').doc('adConfig').get().catch(()=>null)
+]).then(([adsSnap, cfgDoc]) => {
+  const adPool = adsSnap.docs.map(d => ({ id:d.id, ...d.data() }));
+  const cfg = (cfgDoc && cfgDoc.exists) ? cfgDoc.data() : {};
+  const enabled = cfg.enabled !== false && adPool.length > 0;
+  const freq = Math.max(2, cfg.frequency || 6);
+  if (enabled && shouldShowAdGate('wallpaper', freq)) {
+    const ad = adPool[Math.floor(Math.random() * adPool.length)];
+    showAdGate(ad, _wallpapersReady, () => revealWallpaperPage(_wallpapersReady));
+  } else {
+    revealWallpaperPage(_wallpapersReady);
+  }
+}).catch(() => revealWallpaperPage(_wallpapersReady));
+
+/* ══════════════════════════════════
+   KEYBOARD NAV
+══════════════════════════════════ */
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'ArrowRight') goTo(Math.min(cur+1, total-1));
+  if (e.key === 'ArrowUp'   || e.key === 'ArrowLeft')  goTo(Math.max(cur-1, 0));
+});
+
+/* ══════════════════════════════════
+   SAVE
+══════════════════════════════════ */
+function saveWall(btn) {
+  const slide = btn.closest('.slide');
+  const idx   = parseInt(slide.dataset.idx);
+  if (saved.has(idx)) {
+    saved.delete(idx);
+    btn.classList.remove('saved');
+    btn.textContent = '🔖';
+    showToast('Removed from saved');
+  } else {
+    saved.add(idx);
+    btn.classList.add('saved');
+    btn.textContent = '✅';
+    showToast('🔖 Saved to collection');
+  }
+  localStorage.setItem('dwh_wall_saved', JSON.stringify([...saved]));
+}
+
+/* ══════════════════════════════════
+   DOWNLOAD  (canvas render)
+══════════════════════════════════ */
+function downloadWall(btn) {
+  const slide  = btn.closest('.slide');
+  const bgEl   = slide.querySelector('.slide-bg');
+  const textEl = slide.querySelector('.slide-text');
+  const authEl = slide.querySelector('.slide-author');
+  const tagEl  = slide.querySelector('.slide-tag');
+
+  const quoteText  = textEl.innerText;
+  const authorText = authEl.innerText;
+  const tagText    = tagEl.innerText.toUpperCase();
+
+  // Downloads always use the ORIGINAL raw upload (data-raw), never the
+  // shrunk display version — asking Cloudinary for a high-quality resize
+  // of the original so the saved wallpaper is crisp at full 1080×1920.
+  const rawUrl = bgEl.dataset.raw || (bgEl.style.backgroundImage.match(/url\(['"]?(.+?)['"]?\)/) || [])[1];
+  if (!rawUrl) return;
+  // g_west anchors the crop to the left edge — these quote wallpapers have
+  // text baked in on the left, and Cloudinary's default c_fill gravity is
+  // center, which was cutting the text off before the image even reached
+  // the canvas (matches .slide-bg's background-position:left center).
+  const imgUrl = cldUrl(rawUrl, 'f_auto,q_auto:best,w_1080,h_1920,c_fill,g_west');
+
+  btn.textContent = '⏳';
+  btn.style.pointerEvents = 'none';
+
+  const canvas = document.getElementById('dlCanvas');
+  const ctx    = canvas.getContext('2d');
+  // Phone wallpaper: 1080 × 1920
+  canvas.width  = 1080;
+  canvas.height = 1920;
+
+  function finishSuccess() {
+    btn.textContent = '⬇️';
+    btn.style.pointerEvents = '';
+    showToast('⬇️ Wallpaper saved to downloads');
+    const dlIdx = parseInt(slide.dataset.idx);
+    downloaded.add(dlIdx);
+    localStorage.setItem('dwh_wall_downloaded', JSON.stringify([...downloaded]));
+    if (typeof buildWPItems === 'function') buildWPItems();
+  }
+
+  function finishError(reason) {
+    console.error('[downloadWall] failed:', reason);
+    btn.textContent = '⬇️';
+    btn.style.pointerEvents = '';
+    showToast('⚠️ Download failed — try again');
+  }
+
+  function draw(img) {
+    // ── Background — brightness/saturation left close to 1 so the photo
+    // stays true to what was uploaded; only the gradient below adds contrast
+    // near the text so it stays legible. ──
+    const scale   = Math.max(1080/img.width, 1920/img.height);
+    const drawW   = img.width  * scale;
+    const drawH   = img.height * scale;
+    // left-aligned to match .slide-bg's background-position:left center —
+    // these quote wallpapers have text baked in on the left, so cropping
+    // from the center (old behavior) chopped it off. Only the right edge
+    // gets cropped now, never the left.
+    const offX    = 0;
+    const offY    = (1920 - drawH) / 2;
+
+    ctx.filter = 'brightness(0.97) saturate(1)';
+    ctx.drawImage(img, offX, offY, drawW, drawH);
+    ctx.filter = 'none';
+
+    // ── Gradient overlay — light, concentrated near top/bottom text zones ──
+    const grad = ctx.createLinearGradient(0,0,0,1920);
+    grad.addColorStop(0,    'rgba(0,0,0,0.42)');
+    grad.addColorStop(0.22, 'rgba(0,0,0,0.06)');
+    grad.addColorStop(0.55, 'rgba(0,0,0,0.02)');
+    grad.addColorStop(0.78, 'rgba(0,0,0,0.40)');
+    grad.addColorStop(1,    'rgba(0,0,0,0.64)');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, 1080, 1920);
+
+    // ── Brand top ──
+    ctx.font = '400 22px Inter,sans-serif';
+    ctx.fillStyle = 'rgba(255,255,255,0.55)';
+    ctx.textAlign = 'center';
+    ctx.letterSpacing = '4px';
+    ctx.fillText('DANIEL WISDOM HUB', 540, 70);
+    ctx.letterSpacing = '0px';
+
+    if (quoteText.trim()) {
+      // ── Thin line ──
+      ctx.strokeStyle = 'rgba(255,255,255,0.35)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();ctx.moveTo(516,130);ctx.lineTo(564,130);ctx.stroke();
+
+      // ── Quote text ──
+      ctx.font = 'italic 300 68px "Cormorant Garamond",Georgia,serif';
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      ctx.shadowColor = 'rgba(0,0,0,0.5)';
+      ctx.shadowBlur = 12;
+
+      const lines = quoteText.split('\n').flatMap(l => wrapCanvas(ctx, l.trim(), 860));
+      const lineH = 92;
+      const totalH = lines.length * lineH;
+      let y = Math.max(380, (1920 - totalH) / 2 - 60);
+      lines.forEach(l => { ctx.fillText(l, 540, y); y += lineH; });
+      ctx.shadowBlur = 0;
+
+      // ── Author ──
+      if (authorText.trim()) {
+        ctx.font = '400 28px Inter,sans-serif';
+        ctx.fillStyle = 'rgba(255,255,255,0.75)';
+        ctx.letterSpacing = '3px';
+        ctx.fillText(authorText.toUpperCase(), 540, y + 48);
+        ctx.letterSpacing = '0px';
+      }
+    }
+
+    // ── Tag ──
+    if (tagText.trim()) {
+      ctx.font = '500 22px Inter,sans-serif';
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.letterSpacing = '2px';
+      ctx.fillText(tagText, 540, 1860);
+      ctx.letterSpacing = '0px';
+    }
+
+    // ── Download ──
+    try {
+      const link = document.createElement('a');
+      link.href     = canvas.toDataURL('image/jpeg', 0.95);
+      link.download = 'daniel-wisdom-wallpaper.jpg';
+      link.click();
+      finishSuccess();
+    } catch (err) {
+      // Canvas got cross-origin "tainted" — the browser blocks reading it
+      // back out. Fall back to opening the original image directly so the
+      // user still gets a file, even though it won't have the watermark.
+      finishError(err);
+      window.open(imgUrl, '_blank');
+      showToast('⚠️ Watermark unavailable — opened original image instead');
+    }
+  }
+
+  // Fetch as a blob first — more reliable than a plain crossOrigin <img> tag,
+  // which silently fails on some Cloudinary delivery URLs and leaves canvas
+  // "tainted" so the watermark/text never gets drawn.
+  fetch(imgUrl + (imgUrl.includes('?')?'&':'?') + 'dl=' + Date.now(), { mode:'cors' })
+    .then(r => { if (!r.ok) throw new Error('HTTP '+r.status); return r.blob(); })
+    .then(blob => {
+      const objUrl = URL.createObjectURL(blob);
+      const img = new Image();
+      img.onload = () => { draw(img); URL.revokeObjectURL(objUrl); };
+      img.onerror = (e) => { finishError('image decode failed'); URL.revokeObjectURL(objUrl); };
+      img.src = objUrl;
+    })
+    .catch(err => {
+      // Network/CORS fetch itself failed — last-resort fallback: try the
+      // old crossOrigin <img> approach directly against the original URL.
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => draw(img);
+      img.onerror = () => finishError(err);
+      img.src = imgUrl + (imgUrl.includes('?')?'&':'?') + 'dl=' + Date.now();
+    });
+}
+
+/* ── Text wrap helper ── */
+function wrapCanvas(ctx, text, maxW) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+  for (const w of words) {
+    const t = line ? line + ' ' + w : w;
+    if (ctx.measureText(t).width > maxW && line) {
+      lines.push(line); line = w;
+    } else line = t;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+
+/* ══════════════════════════════════
+   TOAST
+══════════════════════════════════ */
+let toastT;
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(toastT);
+  toastT = setTimeout(() => t.classList.remove('show'), 2600);
+}
+
+/* ══════════════════════════════════
+   NETWORK ERROR BANNER
+══════════════════════════════════ */
+let netBannerT;
+function showNetBanner(msg) {
+  const b = document.getElementById('netBanner');
+  if (msg) b.querySelector('.nb-msg').textContent = msg;
+  b.classList.add('show');
+  clearTimeout(netBannerT);
+  netBannerT = setTimeout(() => b.classList.remove('show'), 8000);
+}
+function hideNetBanner() {
+  document.getElementById('netBanner').classList.remove('show');
+  clearTimeout(netBannerT);
+}
+function retryWallpaperLoad() {
+  hideNetBanner();
+  showToast('⏳ Retrying…');
+  loadAdminWallpapers();
+}
+
+/* ══════════════════════════════════
+   IMAGE SKELETON SHIMMER
+   Wraps any background-image element (slide or grid card) with a
+   shimmering placeholder that fades out once the real image has
+   finished loading — or lights up the top network banner if it fails.
+══════════════════════════════════ */
+function attachImgSkeleton(el, url) {
+  if (!url || !el) return;
+  const skel = document.createElement('div');
+  skel.className = 'img-skel';
+  el.prepend(skel);
+  const probe = new Image();
+  probe.onload = () => {
+    skel.classList.add('loaded');
+    setTimeout(() => skel.remove(), 400);
+  };
+  probe.onerror = () => {
+    skel.classList.add('loaded');
+    setTimeout(() => skel.remove(), 400);
+    showNetBanner('⚠️ Some wallpaper images failed to load — check your connection.');
+  };
+  probe.src = url;
+}
+function skeletonizeSlides(slideEls) {
+  slideEls.forEach(slide => {
+    const bgEl = slide.querySelector('.slide-bg');
+    if (!bgEl) return;
+    const m = (bgEl.style.backgroundImage || '').match(/url\(['"]?(.+?)['"]?\)/);
+    if (m) attachImgSkeleton(slide, m[1]);
+  });
+}
+function skeletonizeGrid(containerEl) {
+  containerEl.querySelectorAll('.wp-card').forEach(card => {
+    const m = (card.style.backgroundImage || '').match(/url\(['"]?(.+?)['"]?\)/);
+    if (m) attachImgSkeleton(card, m[1]);
+  });
+}
+
+/* ══════════════════════════════════
+   LAZY-LOAD CARDS
+   Grid/row templates set data-bg instead of an inline background-image,
+   so nothing downloads until a card actually scrolls near the viewport.
+   Before this, every thumbnail on a screen — visible or not — started
+   downloading the moment the tab opened; on a big library that's dozens
+   of simultaneous image requests competing for bandwidth. rootMargin
+   pre-loads a bit before the card is visible so it's ready by the time
+   you scroll to it.
+══════════════════════════════════ */
+const lazyIo = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (!entry.isIntersecting) return;
+    const el = entry.target;
+    const url = el.dataset.bg;
+    if (url) {
+      el.style.backgroundImage = `url('${url}')`;
+      attachImgSkeleton(el, url);
+      el.removeAttribute('data-bg');
+    }
+    lazyIo.unobserve(el);
+  });
+}, { rootMargin: '400px' });
+
+function lazyObserveCards(containerEl, selector) {
+  containerEl.querySelectorAll(selector).forEach(card => {
+    if (card.dataset.bg) lazyIo.observe(card);
+  });
+}
+</script>
+</body>
+</html>

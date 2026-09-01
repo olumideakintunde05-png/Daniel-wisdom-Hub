@@ -1,0 +1,1849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Admin — Daniel Wisdom Hub</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,700;1,9..144,700&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --ink:#080810;--ink1:#0f0f1a;--ink2:#161624;--ink3:#1e1e2e;
+  --wire:rgba(255,255,255,0.08);--snow:#f0effe;--snow2:#a8a6c8;--fog:#56547a;
+  --amber:#ffb347;--lime:#90f08c;--rose:#ff6b9d;
+  --grad-a:linear-gradient(135deg,#ff6b9d,#ffb347);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--snow);font-family:'Outfit',system-ui,sans-serif;min-height:100vh;-webkit-font-smoothing:antialiased}
+.wrap{max-width:520px;margin:0 auto;padding:24px 18px 60px}
+h1{font-family:'Fraunces',serif;font-style:italic;font-size:24px;margin-bottom:4px}
+.sub{font-size:12px;color:var(--fog);margin-bottom:24px}
+
+/* Login */
+#loginBox{background:var(--ink2);border:1px solid var(--wire);border-radius:18px;padding:22px}
+#loginBox input{
+  width:100%;padding:13px 14px;margin-bottom:12px;background:var(--ink3);
+  border:1px solid var(--wire);border-radius:12px;color:var(--snow);font-size:14px;font-family:inherit;
+}
+#loginBox input:focus{outline:none;border-color:var(--rose)}
+#loginBox button, .btn{
+  width:100%;padding:13px;border:none;border-radius:50px;
+  background:var(--grad-a);color:#fff;font-weight:700;font-size:14px;cursor:pointer;
+}
+#loginErr{color:var(--rose);font-size:12px;margin-top:10px;display:none}
+
+/* App */
+#app{display:none}
+.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;gap:12px}
+.topbar-left{display:flex;align-items:center;gap:12px}
+.menu-btn{
+  width:38px;height:38px;border-radius:10px;background:var(--ink2);border:1px solid var(--wire);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;font-size:16px;
+}
+.signout{font-size:12px;color:var(--fog);cursor:pointer;text-decoration:underline;white-space:nowrap}
+
+/* Sidebar drawer */
+#sidebarOverlay{
+  position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:98;
+  opacity:0;pointer-events:none;transition:opacity .25s;
+}
+#sidebarOverlay.open{opacity:1;pointer-events:auto}
+#sidebar{
+  position:fixed;top:0;left:0;bottom:0;width:230px;z-index:99;
+  background:var(--ink1);border-right:1px solid var(--wire);
+  padding:20px 14px;transform:translateX(-100%);transition:transform .3s cubic-bezier(.4,0,.2,1);
+  overflow-y:auto;
+}
+#sidebar.open{transform:translateX(0)}
+.sidebar-brand{font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:18px;margin-bottom:20px;padding:0 8px}
+.side-item{
+  display:flex;align-items:center;gap:10px;padding:12px 10px;border-radius:10px;
+  font-size:13.5px;font-weight:600;color:var(--snow2);cursor:pointer;margin-bottom:4px;
+}
+.side-item.on{background:var(--grad-a);color:#fff}
+.side-ic{font-size:15px;width:18px;text-align:center}
+
+.section{max-width:520px}
+.req-card{
+  background:var(--ink2);border:1px solid var(--wire);border-radius:16px;
+  padding:16px;margin-bottom:12px;
+}
+.req-top{display:flex;justify-content:space-between;align-items:flex-start;gap:10px;margin-bottom:8px}
+.req-title{font-weight:700;font-size:14px}
+.req-amt{font-size:16px;font-weight:800;color:var(--amber);white-space:nowrap}
+.req-meta{font-size:11px;color:var(--fog);margin-bottom:12px;line-height:1.6}
+.req-actions{display:flex;gap:8px}
+.req-actions button{
+  flex:1;padding:10px;border-radius:10px;border:none;font-weight:700;font-size:12.5px;cursor:pointer;
+}
+.approve-btn{background:var(--lime);color:#0a2a08}
+.reject-btn{background:var(--ink3);color:var(--snow2);border:1px solid var(--wire) !important}
+.edit-btn{background:rgba(255,179,71,0.15);color:var(--amber);border:1px solid var(--wire) !important}
+.cancel-edit-link{display:none;text-align:center;font-size:12px;color:var(--fog);text-decoration:underline;cursor:pointer;margin-top:-4px;margin-bottom:12px}
+.status-pill{font-size:10px;font-weight:700;padding:3px 9px;border-radius:50px;text-transform:uppercase;letter-spacing:.5px}
+.status-approved{background:rgba(144,240,140,0.15);color:var(--lime)}
+.status-rejected{background:rgba(255,107,157,0.15);color:var(--rose)}
+.empty{text-align:center;padding:50px 20px;color:var(--fog);font-size:13px}
+.wp-cat-group{margin-bottom:16px}
+.wp-cat-group-head{
+  list-style:none;cursor:pointer;user-select:none;
+  display:flex;align-items:center;gap:8px;
+  font-family:'Fraunces',serif;font-style:italic;font-weight:700;font-size:15px;
+  color:var(--amber);padding:10px 2px;border-bottom:1px solid var(--wire);margin-bottom:10px;
+}
+.wp-cat-group-head::-webkit-details-marker{display:none}
+.wp-cat-group-head::before{content:'▸';font-style:normal;transition:transform .15s}
+.wp-cat-group[open] .wp-cat-group-head::before{transform:rotate(90deg)}
+.wp-cat-group-count{
+  font-family:'Outfit',sans-serif;font-style:normal;font-weight:600;font-size:11px;
+  color:var(--snow2);background:var(--ink3);padding:2px 8px;border-radius:50px;
+}
+
+/* Image upload widget */
+.upload-box{
+  border:1.5px dashed var(--wire);border-radius:14px;padding:20px;text-align:center;
+  margin-bottom:12px;cursor:pointer;position:relative;background:var(--ink3);
+}
+.upload-box input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-box .up-ic{font-size:24px;margin-bottom:6px}
+.upload-box .up-txt{font-size:12.5px;color:var(--snow2);font-weight:600}
+.upload-box .up-sub{font-size:10.5px;color:var(--fog);margin-top:2px}
+.upload-preview{width:100%;max-height:160px;object-fit:cover;border-radius:12px;margin-bottom:12px;display:none}
+.upload-status{font-size:11px;color:var(--amber);margin-bottom:10px;display:none}
+
+/* Camera capture (in-page, never touches the phone's gallery) */
+.camera-btn{
+  width:100%;padding:12px;margin-bottom:6px;border-radius:12px;border:1.5px solid var(--wire);
+  background:var(--ink3);color:var(--snow2);font-weight:600;font-size:12.5px;cursor:pointer;font-family:inherit;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.camera-btn-sub{font-size:10px;color:var(--fog);text-align:center;margin-top:0;margin-bottom:12px}
+#cameraModal{
+  position:fixed;inset:0;background:#000;z-index:200;
+  display:none;flex-direction:column;align-items:center;justify-content:center;
+}
+#cameraModal.open{display:flex}
+#cameraModal video{width:100%;height:100%;object-fit:cover;position:absolute;inset:0}
+.camera-controls{
+  position:absolute;bottom:0;left:0;right:0;padding:60px 24px calc(env(safe-area-inset-bottom,0px)+28px);
+  display:flex;align-items:center;justify-content:space-between;
+  background:linear-gradient(0deg,rgba(0,0,0,0.7),transparent);
+}
+.camera-close{
+  width:42px;height:42px;border-radius:50%;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);
+  color:#fff;font-size:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.camera-shutter{
+  width:66px;height:66px;border-radius:50%;background:#fff;border:4px solid rgba(255,255,255,.4);cursor:pointer;
+}
+.camera-spacer{width:42px}
+.camera-note{
+  position:absolute;top:calc(env(safe-area-inset-top,0px)+16px);left:0;right:0;text-align:center;
+  color:rgba(255,255,255,.85);font-size:11.5px;font-weight:600;padding:0 20px;z-index:1;
+}
+</style>
+</head>
+<body>
+<div id="sidebarOverlay" onclick="dwhCloseSidebar()"></div>
+<div id="sidebar">
+  <div class="sidebar-brand">✦ Admin</div>
+  <div class="side-item on" id="tabPending" onclick="dwhSwitchTab('pending')"><span class="side-ic">⏳</span> Pending</div>
+  <div class="side-item" id="tabAll" onclick="dwhSwitchTab('all')"><span class="side-ic">📋</span> All Requests</div>
+  <div class="side-item" id="tabQuotes" onclick="dwhSwitchTab('quotes')"><span class="side-ic">💬</span> Quotes</div>
+  <div class="side-item" id="tabVerses" onclick="dwhSwitchTab('verses')"><span class="side-ic">🙏</span> Word for Today</div>
+  <div class="side-item" id="tabWallpapers" onclick="dwhSwitchTab('wallpapers')"><span class="side-ic">🖼️</span> Wallpapers</div>
+  <div class="side-item" id="tabAds" onclick="dwhSwitchTab('ads')"><span class="side-ic">📢</span> Ads</div>
+  <div class="side-item" id="tabArticles" onclick="dwhSwitchTab('articles')"><span class="side-ic">📖</span> Articles</div>
+  <div class="side-item" id="tabTrending" onclick="dwhSwitchTab('trending')"><span class="side-ic">🔥</span> Trending Topics</div>
+  <div class="side-item" id="tabLessons" onclick="dwhSwitchTab('lessons')"><span class="side-ic">📘</span> Lessons</div>
+  <div class="side-item" id="tabNotif" onclick="dwhSwitchTab('notif')"><span class="side-ic">🔔</span> Notify</div>
+</div>
+
+<div class="wrap">
+  <div id="loginBox">
+    <h1>✦ Admin</h1>
+    <div class="sub">Daniel Wisdom Hub</div>
+    <input id="loginEmail" type="email" placeholder="Admin email" autocomplete="username"/>
+    <input id="loginPass" type="password" placeholder="Password" autocomplete="current-password"/>
+    <button onclick="dwhAdminLogin()">Log In</button>
+    <div id="loginErr"></div>
+  </div>
+
+  <div id="app">
+    <div class="topbar">
+      <div class="topbar-left">
+        <div class="menu-btn" onclick="dwhOpenSidebar()">☰</div>
+        <div id="whoami" style="font-size:12px;color:var(--fog)"></div>
+      </div>
+      <div class="signout" onclick="dwhAdminLogout()">Sign out</div>
+    </div>
+
+    <!-- Requests (pending/all share this list) -->
+    <div id="reqList" class="section"></div>
+
+    <!-- Quotes -->
+    <div id="quotesSection" class="section" style="display:none">
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Add a quote</div>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">Pick up to 4 background images — the app lets people cycle through them on this quote.</div>
+        <label class="upload-box">
+          <input type="file" accept="image/*" multiple onchange="uploadQuoteImages(this)"/>
+          <div class="up-ic">📷</div>
+          <div class="up-txt">Tap to pick up to 4 images from gallery <span style="color:var(--rose,#ff6b9d)">*required</span></div>
+          <div class="up-sub">Uploads straight to Cloudinary — a quote can't be saved without at least one</div>
+        </label>
+        <div id="qImgPreviews" style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap"></div>
+        <div id="qUploadStatus" class="upload-status"></div>
+        <input id="qText" placeholder="Quote text" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="qAuthor" placeholder="Author (e.g. Unknown)" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <select id="qCat" style="width:100%;padding:12px;margin-bottom:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit">
+          <option value="motivation">Motivation</option>
+          <option value="success">Success</option>
+          <option value="deep">Deep</option>
+          <option value="love">Love</option>
+          <option value="savage">Savage</option>
+          <option value="captions">Captions</option>
+          <option value="proverbs">Proverbs</option>
+          <option value="bestlife">Best Life</option>
+        </select>
+        <button class="btn" id="qSaveBtn" onclick="addQuote()">Add Quote</button>
+        <div class="cancel-edit-link" id="qCancelBtn" onclick="cancelQuoteEdit()">Cancel edit</div>
+      </div>
+      <div id="quotesList"></div>
+    </div>
+
+    <!-- Quote category covers -->
+    <div class="req-card" id="quoteCoversSection" style="display:none">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">Quote category covers</div>
+      <div style="font-size:11px;color:var(--fog);margin-bottom:12px">Set a specific cover image for each quote category — shown on the home screen category cards. Leave one blank to keep using a random photo for it.</div>
+      <div id="quoteCoversList"></div>
+    </div>
+
+    <!-- Picture quote of the day (fully independent of the daily rotating "Quote of the Day" card) -->
+    <div class="req-card" id="pqDaySection" style="display:none">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">🖼️ Picture quote of the day</div>
+      <div style="font-size:11px;color:var(--fog);margin-bottom:12px">This is its own separate feature — a single image + caption you control here. It has nothing to do with the "Quote of the Day" card above (that one rotates automatically using each quote's own image). Whatever you set here is exactly what opens when someone taps the "Picture quote of the day" banner.</div>
+      <div id="pqDayImgPreview"></div>
+      <label class="upload-box" style="padding:12px;margin-bottom:8px">
+        <input type="file" accept="image/*" onchange="uploadPQDayImage(this)"/>
+        <div class="up-txt" style="font-size:11px">Tap to upload the picture</div>
+      </label>
+      <div id="pqDayStatus" class="upload-status" style="display:none"></div>
+      <input id="pqDayImgUrl" placeholder="or paste an image URL" style="width:100%;padding:10px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:12.5px;font-family:inherit"/>
+      <input id="pqDayText" placeholder="Caption / quote text" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+      <input id="pqDayAuthor" placeholder="Author (e.g. Unknown)" style="width:100%;padding:12px;margin-bottom:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+      <button class="btn" onclick="savePQDay()">Save Picture Quote of the Day</button>
+    </div>
+
+    <!-- Word for Today (Bible verses) -->
+    <div id="versesSection" class="section" style="display:none">
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">🙏 Add a Word for Today verse</div>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">One of these shows on the home screen each day — it rotates automatically based on the date, cycling through everything in the list below.</div>
+        <textarea id="vText" placeholder="Verse text" rows="3" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit;resize:vertical"></textarea>
+        <input id="vRef" placeholder="Reference (e.g. Joshua 1:9)" style="width:100%;padding:12px;margin-bottom:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <button class="btn" id="vSaveBtn" onclick="addVerse()">Add Verse</button>
+        <div class="cancel-edit-link" id="vCancelBtn" onclick="cancelVerseEdit()">Cancel edit</div>
+      </div>
+      <div id="versesList"></div>
+    </div>
+
+    <!-- Wallpapers -->
+    <div id="wallpapersSection" class="section" style="display:none">
+      <div class="req-card" style="border-color:rgba(255,179,71,0.4)">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">⬆️ Bring in all built-in wallpapers</div>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">Your 37 existing wallpapers (plus a few starter extras for Sport, Cars, Faith, and Solitude) are currently hardcoded in the app and can't be edited here. Tap once to copy them all into Firestore so they show up below and become editable — edit, replace the image, or delete any one like normal. Safe to tap more than once — it skips any that already exist.</div>
+        <button class="btn" style="background:var(--ink3);color:var(--amber);border:1px solid var(--wire)" onclick="seedStarterWallpapers()">Migrate All Wallpapers</button>
+        <div id="seedWallStatus" style="font-size:11px;color:var(--fog);margin-top:8px;text-align:center;min-height:14px"></div>
+      </div>
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">🔄 Rename a category</div>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">Renames the category label on every wallpaper currently tagged with the old name (live in Firestore) — the pictures themselves don't change, just the tag/heading they sit under.</div>
+        <button class="btn" style="background:var(--ink3);color:var(--snow);border:1px solid var(--wire);margin-bottom:6px" onclick="renameWallpaperCategory('Romance','Cars')">Romance → Cars</button>
+        <button class="btn" style="background:var(--ink3);color:var(--snow);border:1px solid var(--wire);margin-bottom:6px" onclick="renameWallpaperCategory('Ladies','Sport')">Ladies → Sport</button>
+        <button class="btn" style="background:var(--ink3);color:var(--snow);border:1px solid var(--wire);margin-bottom:12px" onclick="renameWallpaperCategory('Pain','Multiverse')">Pain → Multiverse</button>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:6px">Or rename any other category:</div>
+        <input id="renameFrom" placeholder="Current category name" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="renameTo" placeholder="New category name" style="width:100%;padding:12px;margin-bottom:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <button class="btn" onclick="renameWallpaperCategory(document.getElementById('renameFrom').value.trim(), document.getElementById('renameTo').value.trim())">Rename</button>
+      </div>
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px">Add a wallpaper</div>
+        <label class="upload-box">
+          <input type="file" accept="image/*" onchange="uploadImage(this, 'w')"/>
+          <div class="up-ic">📷</div>
+          <div class="up-txt">Tap to pick from gallery</div>
+          <div class="up-sub">Uploads straight to Cloudinary</div>
+        </label>
+        <img id="wPreview" class="upload-preview"/>
+        <button type="button" class="camera-btn" onclick="openCamera('w')">📸 Take Photo</button>
+        <div class="camera-btn-sub">Won't be saved to your phone's gallery</div>
+        <div id="wUploadStatus" class="upload-status"></div>
+        <input id="wUrl" placeholder="or paste an image URL directly" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="wQuote" placeholder="Quote text (optional — leave blank for watermark only)" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="wAuthor" placeholder="Author (optional)" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="wTag" placeholder="Tag (optional — e.g. Motivation, Pain, Finance)" style="width:100%;padding:12px;margin-bottom:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <button class="btn" id="wSaveBtn" onclick="addWallpaper()">Add Wallpaper</button>
+        <div class="cancel-edit-link" id="wCancelBtn" onclick="cancelWallpaperEdit()">Cancel edit</div>
+      </div>
+      <div id="wallpapersList"></div>
+    </div>
+
+    <!-- Ads -->
+    <div id="adsSection" class="section" style="display:none">
+      <div class="req-card" style="border-color:rgba(110,198,255,0.4)">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">⚙️ Ad settings</div>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">Controls how often the full-screen ad screen appears when someone opens the Wallpapers page or taps Explore — e.g. a frequency of 6 shows it on roughly 1 out of every 6 visits, instead of every single time.</div>
+        <label style="font-size:12px;color:var(--snow2);display:flex;align-items:center;gap:8px;margin-bottom:10px">
+          <input type="checkbox" id="adEnabled" checked/> Ads enabled
+        </label>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:6px">Show the ad screen every</div>
+        <input id="adFreq" type="number" min="2" max="50" value="6" style="width:100%;padding:12px;margin-bottom:4px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">visits</div>
+        <button class="btn" onclick="saveAdSettings()">Save Settings</button>
+        <div id="adSettingsStatus" style="font-size:11px;color:var(--lime);margin-top:8px;text-align:center;min-height:14px"></div>
+      </div>
+
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px">Add an ad</div>
+        <label class="upload-box">
+          <input type="file" accept="image/*" multiple onchange="uploadImage(this, 'ad')"/>
+          <div class="up-ic">📷</div>
+          <div class="up-txt">Tap to pick from gallery (you can select more than one)</div>
+          <div class="up-sub">Uploads straight to Cloudinary</div>
+        </label>
+        <img id="adPreview" class="upload-preview"/>
+        <button type="button" class="camera-btn" onclick="openCamera('ad')">📸 Take Photo</button>
+        <div class="camera-btn-sub">Won't be saved to your phone's gallery</div>
+        <div id="adUploadStatus" class="upload-status"></div>
+        <input id="adUrl" placeholder="or paste an image URL directly" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="adLink" placeholder="Link URL (where tapping the ad goes)" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="adLabel" placeholder="Label (default: Advertisement)" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="adCta" placeholder="Button text (default: Get Yours Now)" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <label style="font-size:12px;color:var(--snow2);display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <input type="checkbox" id="adActive" checked/> Active (goes live immediately)
+        </label>
+        <button class="btn" id="adSaveBtn" onclick="addAd()">Add Ad</button>
+        <div class="cancel-edit-link" id="adCancelBtn" onclick="cancelAdEdit()">Cancel edit</div>
+      </div>
+      <div id="adsList"></div>
+    </div>
+
+    <!-- Wallpaper category covers -->
+    <div class="req-card" id="wallpaperCoversSection" style="display:none">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">Wallpaper category covers</div>
+      <div style="font-size:11px;color:var(--fog);margin-bottom:12px">Set a specific cover image for each wallpaper category — shown as its Featured Collection card. Leave one blank to keep using whichever wallpaper happens to be first in that category.</div>
+      <div id="wallpaperCoversList"></div>
+      <div style="font-weight:700;font-size:14px;margin:18px 0 4px">Home page banner</div>
+      <div style="font-size:11px;color:var(--fog);margin-bottom:12px">The "Quote Wallpapers" card on the home screen that links into the wallpaper app.</div>
+      <div id="homeBannerCoverList"></div>
+    </div>
+
+    <!-- Articles -->
+    <div id="articlesSection" class="section" style="display:none">
+      <div class="req-card" style="border-color:rgba(255,179,71,0.4)">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">⬆️ Bring in the 17 built-in articles</div>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">These are currently hardcoded in the app and can't be edited here. Tap once to copy them into Firestore so they show up below and become editable. Safe to tap more than once — it never overwrites an article that's already been migrated or edited.</div>
+        <button class="btn" style="background:var(--ink3);color:var(--amber);border:1px solid var(--wire)" onclick="migrateBuiltInArticles()">Migrate Built-In Articles</button>
+        <div id="migrateArticlesStatus" style="font-size:11px;color:var(--fog);margin-top:8px;text-align:center;min-height:14px"></div>
+      </div>
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px">Add an article</div>
+        <label class="upload-box">
+          <input type="file" accept="image/*" onchange="uploadImage(this, 'art')"/>
+          <div class="up-ic">📷</div>
+          <div class="up-txt">Tap to pick a cover image from gallery</div>
+          <div class="up-sub">Uploads straight to Cloudinary</div>
+        </label>
+        <img id="artPreview" class="upload-preview"/>
+        <button type="button" class="camera-btn" onclick="openCamera('art')">📸 Take Photo</button>
+        <div class="camera-btn-sub">Won't be saved to your phone's gallery</div>
+        <div id="artUploadStatus" class="upload-status"></div>
+        <input id="artImg" placeholder="or paste an image URL directly" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="artTitle" placeholder="Article title" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="artPreviewTxt" placeholder="Short preview line (shown on the card)" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <select id="artCat" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit">
+          <option value="deep">Deep</option>
+          <option value="success">Success</option>
+          <option value="motivation">Motivation</option>
+          <option value="love">Love</option>
+          <option value="savage">Savage</option>
+        </select>
+        <textarea id="artContent" placeholder="Full article content — HTML ok, e.g. <h3>Heading</h3><p>Paragraph</p>" rows="6" style="width:100%;padding:12px;margin-bottom:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"></textarea>
+        <button class="btn" id="artSaveBtn" onclick="addArticle()">Add Article</button>
+        <div class="cancel-edit-link" id="artCancelBtn" onclick="cancelArticleEdit()">Cancel edit</div>
+      </div>
+      <div id="articlesList"></div>
+    </div>
+
+    <!-- Trending Topics -->
+    <div id="trendingSection" class="section" style="display:none">
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:4px">Add a trending topic</div>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">Real things happening in Nigeria & the world — news, culture, sports, business. This is what makes your app different from other quote apps.</div>
+        <label class="upload-box">
+          <input type="file" accept="image/*" onchange="uploadImage(this, 'trend')"/>
+          <div class="up-ic">📷</div>
+          <div class="up-txt">Tap to pick a cover image from gallery</div>
+          <div class="up-sub">Optional</div>
+        </label>
+        <img id="trendPreview" class="upload-preview"/>
+        <button type="button" class="camera-btn" onclick="openCamera('trend')">📸 Take Photo</button>
+        <div class="camera-btn-sub">Won't be saved to your phone's gallery</div>
+        <div id="trendUploadStatus" class="upload-status"></div>
+        <input id="trendImg" placeholder="or paste an image URL directly" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="trendTitle" placeholder="Headline / topic title" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <textarea id="trendSummary" placeholder="Short summary (1-2 sentences)" rows="3" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"></textarea>
+        <select id="trendCat" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit">
+          <option value="Nigeria">Nigeria</option>
+          <option value="World">World</option>
+          <option value="Business">Business</option>
+          <option value="Tech">Tech</option>
+          <option value="Entertainment">Entertainment</option>
+          <option value="Sports">Sports</option>
+        </select>
+        <input id="trendLink" placeholder="Link to full story (optional)" style="width:100%;padding:12px;margin-bottom:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <button class="btn" id="trendSaveBtn" onclick="addTrending()">Post Trending Topic</button>
+        <div class="cancel-edit-link" id="trendCancelBtn" onclick="cancelTrendingEdit()">Cancel edit</div>
+      </div>
+      <div id="trendingList"></div>
+    </div>
+
+    <!-- Lessons -->
+    <div id="lessonsSection" class="section" style="display:none">
+      <div class="req-card" style="border-color:rgba(255,179,71,0.4)">
+        <div style="font-weight:700;font-size:14px;margin-bottom:6px">⬆️ Bring in the 3 built-in lessons</div>
+        <div style="font-size:11px;color:var(--fog);margin-bottom:12px">"Business Strategy", "General Knowledge", and "Ajo & Esusu" are currently hardcoded in the app and can't be edited here. Tap once to copy them into Firestore so they show up below and become editable. Safe to tap more than once — it never overwrites a lesson that's already been migrated or edited.</div>
+        <button class="btn" style="background:var(--ink3);color:var(--amber);border:1px solid var(--wire)" onclick="migrateBuiltInLessons()">Migrate Built-In Lessons</button>
+        <div id="migrateStatus" style="font-size:11px;color:var(--fog);margin-top:8px;text-align:center;min-height:14px"></div>
+      </div>
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:12px">Add a lesson (Learning Hub topic)</div>
+        <input id="lTitle" placeholder="Topic title" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <input id="lBlurb" placeholder="Short description shown on the card" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <label class="upload-box">
+          <input type="file" accept="image/*" onchange="uploadImage(this, 'l')"/>
+          <div class="up-ic">📷</div>
+          <div class="up-txt">Tap to pick a cover image from gallery</div>
+          <div class="up-sub">Optional — used on the topic card</div>
+        </label>
+        <img id="lPreview" class="upload-preview"/>
+        <button type="button" class="camera-btn" onclick="openCamera('l')">📸 Take Photo</button>
+        <div class="camera-btn-sub">Won't be saved to your phone's gallery</div>
+        <div id="lUploadStatus" class="upload-status"></div>
+        <input id="lImage" placeholder="or paste an image URL directly" style="width:100%;padding:12px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        <div style="display:flex;gap:8px;margin-bottom:8px">
+          <input id="lIcon" placeholder="Emoji badge" value="📘" style="flex:1;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+          <input id="lPrice" type="number" placeholder="Price (₦)" style="flex:1;padding:12px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:13px;font-family:inherit"/>
+        </div>
+        <div id="lPagesWrap"></div>
+        <button class="btn" style="background:var(--ink3);color:var(--snow2);border:1px solid var(--wire);margin-bottom:10px" onclick="addLessonPageField()">+ Add Page</button>
+        <button class="btn" id="lSaveBtn" onclick="addLesson()">Save Lesson</button>
+        <div class="cancel-edit-link" id="lCancelBtn" onclick="cancelLessonEdit()">Cancel edit</div>
+      </div>
+      <div id="lessonsList"></div>
+    </div>
+
+    <!-- Notifications -->
+    <div id="notifSection" class="section" style="display:none">
+      <div class="req-card">
+        <div style="font-weight:700;font-size:14px;margin-bottom:8px">Send a push notification</div>
+        <div style="font-size:12px;color:var(--snow2);line-height:1.6;margin-bottom:14px">
+          Push notifications go through OneSignal (already wired into your app for both Android and iOS). Sending safely requires your OneSignal API key, which should never sit in this page's code since anyone could view it. Use the OneSignal dashboard directly — it's built exactly for this, no extra coding needed.
+        </div>
+        <a class="btn" style="display:block;text-align:center;text-decoration:none" href="https://dashboard.onesignal.com" target="_blank" rel="noopener">Open OneSignal Dashboard →</a>
+        <div style="font-size:11px;color:var(--fog);margin-top:12px;line-height:1.6">
+          In OneSignal: Messages → New Push → write your title/text → Send to All Subscribers. It reaches Android and iOS users automatically since both are subscribed through the same SDK already in your app.
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-firestore-compat.js"></script>
+<script>
+const firebaseConfig = {
+  apiKey: "AIzaSyAKMI3LZwlPO-VungZEz3T8_eNwbuSBfhw",
+  authDomain: "daniel-wisdom-hub.firebaseapp.com",
+  projectId: "daniel-wisdom-hub",
+  storageBucket: "daniel-wisdom-hub.firebasestorage.app",
+  messagingSenderId: "911988639155",
+  appId: "1:911988639155:web:e1b781c3054734536c77c6",
+};
+firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db   = firebase.firestore();
+
+let curTab = 'pending';
+let unsubReq = null;
+
+auth.onAuthStateChanged(user => {
+  if (user && !user.isAnonymous) {
+    document.getElementById('loginBox').style.display = 'none';
+    document.getElementById('app').style.display = 'block';
+    document.getElementById('whoami').textContent = user.email;
+    listenRequests();
+  } else {
+    document.getElementById('loginBox').style.display = 'block';
+    document.getElementById('app').style.display = 'none';
+    if (unsubReq) unsubReq();
+  }
+});
+
+function dwhAdminLogin(){
+  const email = document.getElementById('loginEmail').value.trim();
+  const pass  = document.getElementById('loginPass').value;
+  const errEl = document.getElementById('loginErr');
+  errEl.style.display = 'none';
+  auth.signInWithEmailAndPassword(email, pass).catch(err => {
+    errEl.textContent = 'Login failed — check email and password.';
+    errEl.style.display = 'block';
+  });
+}
+function dwhAdminLogout(){ auth.signOut(); }
+
+function dwhOpenSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('sidebarOverlay').classList.add('open'); }
+function dwhCloseSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('sidebarOverlay').classList.remove('open'); }
+
+function dwhSwitchTab(tab){
+  curTab = tab;
+  const tabIds = { pending:'tabPending', all:'tabAll', quotes:'tabQuotes', verses:'tabVerses', wallpapers:'tabWallpapers', ads:'tabAds', articles:'tabArticles', trending:'tabTrending', lessons:'tabLessons', notif:'tabNotif' };
+  Object.entries(tabIds).forEach(([key,id])=>{
+    document.getElementById(id).classList.toggle('on', key===tab);
+  });
+  document.getElementById('reqList').style.display = (tab==='pending'||tab==='all') ? 'block' : 'none';
+  document.getElementById('quotesSection').style.display = tab==='quotes' ? 'block' : 'none';
+  document.getElementById('versesSection').style.display = tab==='verses' ? 'block' : 'none';
+  document.getElementById('wallpapersSection').style.display = tab==='wallpapers' ? 'block' : 'none';
+  document.getElementById('quoteCoversSection').style.display = tab==='quotes' ? 'block' : 'none';
+  document.getElementById('pqDaySection').style.display = tab==='quotes' ? 'block' : 'none';
+  document.getElementById('wallpaperCoversSection').style.display = tab==='wallpapers' ? 'block' : 'none';
+  document.getElementById('adsSection').style.display = tab==='ads' ? 'block' : 'none';
+  document.getElementById('articlesSection').style.display = tab==='articles' ? 'block' : 'none';
+  document.getElementById('trendingSection').style.display = tab==='trending' ? 'block' : 'none';
+  document.getElementById('lessonsSection').style.display = tab==='lessons' ? 'block' : 'none';
+  document.getElementById('notifSection').style.display = tab==='notif' ? 'block' : 'none';
+
+  if (tab==='pending'||tab==='all') listenRequests();
+  if (tab==='quotes'){ listenQuotes(); listenCatCovers(); renderQuoteCovers(); listenPQDay(); }
+  if (tab==='verses') listenVerses();
+  if (tab==='wallpapers'){ listenWallpapers(); listenCatCovers(); renderWallpaperCovers(window._lastWallpaperTags || []); renderHomeBannerCover(); }
+  if (tab==='ads'){ listenAds(); listenAdSettings(); }
+  if (tab==='articles') listenArticles();
+  if (tab==='trending') listenTrending();
+  if (tab==='lessons') listenLessons();
+  dwhCloseSidebar();
+}
+
+/* ══════════════════════════════════
+   IMAGE UPLOAD (Cloudinary — unsigned, free tier)
+══════════════════════════════════ */
+// TODO: fill these in from your Cloudinary dashboard (Settings → Upload → Upload presets, set Signing Mode to "Unsigned")
+const CLOUDINARY_CLOUD_NAME = 'o2rk8qss';
+const CLOUDINARY_UPLOAD_PRESET = 'wisdom-hub';
+
+function uploadImage(input, prefix){
+  const files = input.files;
+  if (!files || !files.length) return;
+  if (prefix === 'ad' && files.length > 1){
+    uploadMultipleAds(files);
+    input.value = ''; // reset so picking the same files again still fires onchange
+    return;
+  }
+  uploadFileToCloudinary(files[0], prefix);
+}
+
+// Bulk path for ads only — picking several photos at once uploads each to
+// Cloudinary and creates one "ads" doc per photo, all sharing whatever
+// link/label/cta/active values are currently filled in the form. That's
+// how you add more than one ad image without repeating the whole form.
+function uploadMultipleAds(files){
+  const linkUrl = document.getElementById('adLink').value.trim();
+  const label = document.getElementById('adLabel').value.trim() || 'Advertisement';
+  const cta = document.getElementById('adCta').value.trim() || 'Learn More';
+  const active = document.getElementById('adActive').checked;
+  if (!linkUrl){ alert('Add a link URL first — where tapping the ads should go (all selected images will share it)'); return; }
+  if (CLOUDINARY_CLOUD_NAME === 'YOUR_CLOUD_NAME'){ alert('Cloudinary not set up yet'); return; }
+
+  const statusEl = document.getElementById('adUploadStatus');
+  const list = Array.from(files);
+  let done = 0, failed = 0;
+  statusEl.style.display = 'block';
+  statusEl.textContent = `⏳ Uploading 0 / ${list.length}…`;
+
+  function uploadOne(file){
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+    return fetch(uploadUrl, { method:'POST', body: formData })
+      .then(async r => {
+        const raw = await r.text();
+        let data; try { data = JSON.parse(raw); } catch(e) { data = null; }
+        if (r.ok && data?.secure_url){
+          return db.collection('ads').add({
+            img: data.secure_url, linkUrl, label, cta, active,
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          });
+        }
+        throw new Error(data?.error?.message || raw.slice(0,150) || 'upload failed');
+      });
+  }
+
+  let chain = Promise.resolve();
+  list.forEach(file => {
+    chain = chain.then(() => uploadOne(file))
+      .then(() => { done++; statusEl.textContent = `⏳ Uploading ${done+failed} / ${list.length}…`; })
+      .catch(err => { failed++; console.log('[Ads bulk upload] failed:', err.message); statusEl.textContent = `⏳ Uploading ${done+failed} / ${list.length}…`; });
+  });
+  chain.then(() => {
+    statusEl.textContent = failed
+      ? `✅ Added ${done} ad${done!==1?'s':''} — ⚠️ ${failed} failed`
+      : `✅ Added ${done} ad${done!==1?'s':''}`;
+    document.getElementById('adLink').value = '';
+    document.getElementById('adLabel').value = '';
+    document.getElementById('adCta').value = '';
+    document.getElementById('adPreview').style.display = 'none';
+  });
+}
+
+// Shared upload path — used by both the gallery file picker and the
+// in-page camera capture, so every image (however it was chosen) ends
+// up going through the exact same Cloudinary upload + status handling.
+function uploadFileToCloudinary(file, prefix){
+  const statusEl = document.getElementById(prefix+'UploadStatus');
+  const previewEl = document.getElementById(prefix+'Preview');
+  const URL_FIELD_BY_PREFIX = { w:'wUrl', art:'artImg', trend:'trendImg', l:'lImage', ad:'adUrl' };
+  const urlField = document.getElementById(URL_FIELD_BY_PREFIX[prefix] || 'artImg');
+
+  if (CLOUDINARY_CLOUD_NAME === 'YOUR_CLOUD_NAME') {
+    statusEl.textContent = '⚠️ Cloudinary not set up yet — paste an image URL below instead.';
+    statusEl.style.display = 'block';
+    return;
+  }
+
+  previewEl.src = URL.createObjectURL(file);
+  previewEl.style.display = 'block';
+  statusEl.textContent = '⏳ Uploading…';
+  statusEl.style.display = 'block';
+
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+
+  fetch(uploadUrl, { method:'POST', body: formData })
+    .then(async r => {
+      const raw = await r.text();
+      let data; try { data = JSON.parse(raw); } catch(e) { data = null; }
+      console.log('[Cloudinary] status:', r.status, '| url:', uploadUrl, '| preset:', CLOUDINARY_UPLOAD_PRESET, '| raw response:', raw);
+      if (r.ok && data?.secure_url) {
+        urlField.value = data.secure_url;
+        statusEl.textContent = '✅ Uploaded';
+      } else {
+        const msg = data?.error?.message || raw.slice(0,200) || 'unknown error';
+        statusEl.innerHTML = `⚠️ Upload failed (HTTP ${r.status}): ${msg}<br><span style="font-size:10px;opacity:.7">cloud: ${CLOUDINARY_CLOUD_NAME} · preset: ${CLOUDINARY_UPLOAD_PRESET}</span>`;
+      }
+    })
+    .catch(err => { statusEl.textContent = '⚠️ Upload failed: ' + err.message; console.log('[Cloudinary] network error:', err); });
+}
+
+/* ══════════════════════════════════
+   IN-PAGE CAMERA CAPTURE
+   Opens the phone's camera inside the page (getUserMedia) instead of
+   handing off to the native Camera app. The native Camera app is what
+   saves photos to the gallery — this path never touches it, so nothing
+   gets left behind on the phone.
+══════════════════════════════════ */
+let cameraStream = null;
+let cameraPrefix = null;
+
+function openCamera(prefix){
+  cameraPrefix = prefix;
+  const modal = document.getElementById('cameraModal');
+  const video = document.getElementById('cameraVideo');
+  navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false })
+    .then(stream => {
+      cameraStream = stream;
+      video.srcObject = stream;
+      modal.classList.add('open');
+    })
+    .catch(err => {
+      console.log('[Camera] failed to open:', err);
+      alert('⚠️ Could not open camera: ' + err.message + '\n\nYou can still use "Tap to pick" above to choose an existing photo.');
+    });
+}
+
+function closeCamera(){
+  const modal = document.getElementById('cameraModal');
+  modal.classList.remove('open');
+  if (cameraStream){
+    cameraStream.getTracks().forEach(t => t.stop());
+    cameraStream = null;
+  }
+  cameraPrefix = null;
+}
+
+function captureCameraPhoto(){
+  const video = document.getElementById('cameraVideo');
+  const canvas = document.getElementById('cameraCanvas');
+  canvas.width = video.videoWidth;
+  canvas.height = video.videoHeight;
+  const ctx = canvas.getContext('2d');
+  ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+  const prefix = cameraPrefix;
+  canvas.toBlob(blob => {
+    closeCamera();
+    if (!blob) return;
+    const file = new File([blob], 'capture-'+Date.now()+'.jpg', { type: 'image/jpeg' });
+    uploadFileToCloudinary(file, prefix);
+  }, 'image/jpeg', 0.92);
+}
+
+/* ══════════════════════════════════
+   ARTICLES
+══════════════════════════════════ */
+let unsubArticles=null;
+function listenArticles(){
+  if (unsubArticles) unsubArticles();
+  unsubArticles = db.collection('articles').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const list=document.getElementById('articlesList');
+    if (snap.empty){ list.innerHTML=`<div class="empty">No admin articles added yet.</div>`; return; }
+    list.innerHTML = snap.docs.map(doc=>{
+      const d=doc.data();
+      return `<div class="req-card">
+        <div class="req-title">${d.title}</div>
+        <div class="req-meta">${d.cat||''} · ${d.preview||''}</div>
+        <div class="req-actions"><button class="edit-btn" onclick="editArticle('${doc.id}')">Edit</button><button class="reject-btn" onclick="deleteDoc('articles','${doc.id}')">Delete</button></div>
+      </div>`;
+    }).join('');
+  });
+}
+let editingArticleId=null;
+function editArticle(id){
+  db.collection('articles').doc(id).get().then(doc=>{
+    if(!doc.exists) return;
+    const d=doc.data();
+    document.getElementById('artTitle').value=d.title||'';
+    document.getElementById('artPreviewTxt').value=d.preview||'';
+    document.getElementById('artImg').value=d.img||'';
+    document.getElementById('artCat').value=d.cat||'deep';
+    document.getElementById('artContent').value=d.content||'';
+    editingArticleId=id;
+    document.getElementById('artSaveBtn').textContent='Update Article';
+    document.getElementById('artCancelBtn').style.display='block';
+    document.getElementById('articlesSection').scrollIntoView({behavior:'smooth'});
+  }).catch(err=>alert('Failed to load: '+err.message));
+}
+function cancelArticleEdit(){
+  editingArticleId=null;
+  document.getElementById('artTitle').value='';
+  document.getElementById('artPreviewTxt').value='';
+  document.getElementById('artImg').value='';
+  document.getElementById('artContent').value='';
+  document.getElementById('artPreview').style.display='none';
+  document.getElementById('artUploadStatus').style.display='none';
+  document.getElementById('artSaveBtn').textContent='Add Article';
+  document.getElementById('artCancelBtn').style.display='none';
+}
+function addArticle(){
+  const title=document.getElementById('artTitle').value.trim();
+  const preview=document.getElementById('artPreviewTxt').value.trim();
+  const img=document.getElementById('artImg').value.trim();
+  const cat=document.getElementById('artCat').value;
+  const content=document.getElementById('artContent').value.trim();
+  if(!title || !content){ alert('Title and content are required'); return; }
+  const data={ title, preview, img, cat, content };
+  if (editingArticleId){
+    db.collection('articles').doc(editingArticleId).update(data)
+      .then(cancelArticleEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  } else {
+    db.collection('articles').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(cancelArticleEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  }
+}
+
+/* ══════════════════════════════════
+   TRENDING TOPICS
+══════════════════════════════════ */
+let unsubTrending=null;
+function listenTrending(){
+  if (unsubTrending) unsubTrending();
+  unsubTrending = db.collection('trending').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const list=document.getElementById('trendingList');
+    if (snap.empty){ list.innerHTML=`<div class="empty">No trending topics posted yet.</div>`; return; }
+    list.innerHTML = snap.docs.map(doc=>{
+      const d=doc.data();
+      return `<div class="req-card">
+        <div class="req-title">${d.title}</div>
+        <div class="req-meta">${d.category||'Nigeria'} · ${d.summary||''}</div>
+        <div class="req-actions"><button class="edit-btn" onclick="editTrending('${doc.id}')">Edit</button><button class="reject-btn" onclick="deleteDoc('trending','${doc.id}')">Delete</button></div>
+      </div>`;
+    }).join('');
+  });
+}
+let editingTrendingId=null;
+function editTrending(id){
+  db.collection('trending').doc(id).get().then(doc=>{
+    if(!doc.exists) return;
+    const d=doc.data();
+    document.getElementById('trendTitle').value=d.title||'';
+    document.getElementById('trendSummary').value=d.summary||'';
+    document.getElementById('trendImg').value=d.img||'';
+    document.getElementById('trendCat').value=d.category||'Nigeria';
+    document.getElementById('trendLink').value=d.link||'';
+    editingTrendingId=id;
+    document.getElementById('trendSaveBtn').textContent='Update Topic';
+    document.getElementById('trendCancelBtn').style.display='block';
+    document.getElementById('trendingSection').scrollIntoView({behavior:'smooth'});
+  }).catch(err=>alert('Failed to load: '+err.message));
+}
+function cancelTrendingEdit(){
+  editingTrendingId=null;
+  document.getElementById('trendTitle').value='';
+  document.getElementById('trendSummary').value='';
+  document.getElementById('trendImg').value='';
+  document.getElementById('trendLink').value='';
+  document.getElementById('trendPreview').style.display='none';
+  document.getElementById('trendUploadStatus').style.display='none';
+  document.getElementById('trendSaveBtn').textContent='Post Trending Topic';
+  document.getElementById('trendCancelBtn').style.display='none';
+}
+function addTrending(){
+  const title=document.getElementById('trendTitle').value.trim();
+  const summary=document.getElementById('trendSummary').value.trim();
+  const img=document.getElementById('trendImg').value.trim();
+  const category=document.getElementById('trendCat').value;
+  const link=document.getElementById('trendLink').value.trim();
+  if(!title){ alert('Enter a title'); return; }
+  const data={ title, summary, img, category, link };
+  if (editingTrendingId){
+    db.collection('trending').doc(editingTrendingId).update(data)
+      .then(cancelTrendingEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  } else {
+    db.collection('trending').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(cancelTrendingEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  }
+}
+
+/* ══════════════════════════════════
+   QUOTES
+══════════════════════════════════ */
+let unsubQuotes=null;
+let qPendingImages=[]; // uploaded Cloudinary URLs for the quote being composed
+function uploadQuoteImages(input){
+  const files=[...input.files].slice(0,4); // cap at 4, matching app's bgOptions pattern
+  if(!files.length) return;
+  const statusEl=document.getElementById('qUploadStatus');
+  const previewsEl=document.getElementById('qImgPreviews');
+  if (CLOUDINARY_CLOUD_NAME === 'YOUR_CLOUD_NAME') {
+    statusEl.textContent='⚠️ Cloudinary not set up yet.';
+    statusEl.style.display='block';
+    return;
+  }
+  statusEl.textContent=`⏳ Uploading 0/${files.length}…`;
+  statusEl.style.display='block';
+  qPendingImages=[];
+  let done=0;
+  files.forEach(file=>{
+    const formData=new FormData();
+    formData.append('file', file);
+    formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+    const uploadUrl = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+    fetch(uploadUrl, { method:'POST', body:formData })
+      .then(async r=>{
+        const raw = await r.text();
+        let data; try { data = JSON.parse(raw); } catch(e) { data = null; }
+        console.log('[Cloudinary] status:', r.status, '| url:', uploadUrl, '| preset:', CLOUDINARY_UPLOAD_PRESET, '| raw response:', raw);
+        done++;
+        if(r.ok && data?.secure_url){
+          qPendingImages.push(data.secure_url);
+          const img=document.createElement('img');
+          img.src=data.secure_url;
+          img.style.cssText='width:56px;height:56px;object-fit:cover;border-radius:8px';
+          previewsEl.appendChild(img);
+          statusEl.textContent = done===files.length ? `✅ ${qPendingImages.length} image(s) ready` : `⏳ Uploading ${done}/${files.length}…`;
+        } else {
+          const msg = data?.error?.message || raw.slice(0,200) || 'unknown error';
+          statusEl.innerHTML = `⚠️ Upload failed (HTTP ${r.status}): ${msg}<br><span style="font-size:10px;opacity:.7">cloud: ${CLOUDINARY_CLOUD_NAME} · preset: ${CLOUDINARY_UPLOAD_PRESET}</span>`;
+        }
+      })
+      .catch(err=>{ done++; statusEl.textContent=`⚠️ Some uploads failed (${done}/${files.length}): ${err.message}`; console.log('[Cloudinary] network error:', err); });
+  });
+}
+
+function listenQuotes(){
+  if (unsubQuotes) unsubQuotes();
+  unsubQuotes = db.collection('quotes').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const list=document.getElementById('quotesList');
+    if (snap.empty){ list.innerHTML=`<div class="empty">No admin quotes added yet.</div>`; return; }
+    const docs=[...snap.docs].sort((a,b)=>{
+      const aMissing=!(a.data().bgOptions||[]).length, bMissing=!(b.data().bgOptions||[]).length;
+      return (bMissing?1:0)-(aMissing?1:0); // quotes with no image bubble to the top
+    });
+    list.innerHTML = docs.map(doc=>{
+      const d=doc.data();
+      const imgCount=(d.bgOptions||[]).length;
+      const warn = !imgCount ? `<div style="font-size:11px;font-weight:700;color:var(--rose,#ff6b9d);margin:4px 0">⚠️ No cover image — shows blank in the app. Tap Edit and upload one.</div>` : '';
+      return `<div class="req-card"${!imgCount ? ' style="border-color:rgba(255,107,157,0.5)"' : ''}>
+        <div class="req-title">"${d.q}"</div>
+        <div class="req-meta">— ${d.a||'Unknown'} · ${d.cat||'motivation'} · ${imgCount} image(s)</div>
+        ${warn}
+        <div class="req-actions"><button class="edit-btn" onclick="editQuote('${doc.id}')">Edit</button><button class="reject-btn" onclick="deleteDoc('quotes','${doc.id}')">Delete</button></div>
+      </div>`;
+    }).join('');
+  });
+}
+let editingQuoteId=null;
+function editQuote(id){
+  db.collection('quotes').doc(id).get().then(doc=>{
+    if(!doc.exists) return;
+    const d=doc.data();
+    document.getElementById('qText').value=d.q||'';
+    document.getElementById('qAuthor').value=d.a||'';
+    document.getElementById('qCat').value=d.cat||'motivation';
+    qPendingImages=d.bgOptions && d.bgOptions.length ? [...d.bgOptions] : (d.img ? [d.img] : []);
+    const previewsEl=document.getElementById('qImgPreviews');
+    previewsEl.innerHTML='';
+    qPendingImages.forEach(url=>{
+      const img=document.createElement('img');
+      img.src=url;
+      img.style.cssText='width:56px;height:56px;object-fit:cover;border-radius:8px';
+      previewsEl.appendChild(img);
+    });
+    editingQuoteId=id;
+    document.getElementById('qSaveBtn').textContent='Update Quote';
+    document.getElementById('qCancelBtn').style.display='block';
+    document.getElementById('quotesSection').scrollIntoView({behavior:'smooth'});
+  }).catch(err=>alert('Failed to load: '+err.message));
+}
+function cancelQuoteEdit(){
+  editingQuoteId=null;
+  document.getElementById('qText').value='';
+  document.getElementById('qAuthor').value='';
+  document.getElementById('qImgPreviews').innerHTML='';
+  document.getElementById('qUploadStatus').style.display='none';
+  qPendingImages=[];
+  document.getElementById('qSaveBtn').textContent='Add Quote';
+  document.getElementById('qCancelBtn').style.display='none';
+}
+function addQuote(){
+  const q=document.getElementById('qText').value.trim();
+  const a=document.getElementById('qAuthor').value.trim() || 'Unknown';
+  const cat=document.getElementById('qCat').value;
+  if(!q){ alert('Enter quote text'); return; }
+  if(!qPendingImages.length){ alert('Upload at least one cover image for this quote before saving — quotes without a cover image show up blank in the app.'); return; }
+  const data={ q, a, cat, bgOptions: qPendingImages, img: qPendingImages[0]||'' };
+  if (editingQuoteId){
+    db.collection('quotes').doc(editingQuoteId).update(data)
+      .then(cancelQuoteEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  } else {
+    db.collection('quotes').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(cancelQuoteEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  }
+}
+
+/* ══════════════════════════════════
+   WORD FOR TODAY — BIBLE VERSES
+══════════════════════════════════ */
+let unsubVerses=null, editingVerseId=null;
+function listenVerses(){
+  if (unsubVerses) unsubVerses();
+  unsubVerses = db.collection('verses').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const list=document.getElementById('versesList');
+    if (snap.empty){ list.innerHTML=`<div class="empty">No verses added yet — the app is using its 5 built-in defaults until you add some here.</div>`; return; }
+    list.innerHTML = snap.docs.map(doc=>{
+      const d=doc.data();
+      return `<div class="req-card">
+        <div class="req-title">"${d.text}"</div>
+        <div class="req-meta">— ${d.ref||'Unknown'}</div>
+        <div class="req-actions"><button class="edit-btn" onclick="editVerse('${doc.id}')">Edit</button><button class="reject-btn" onclick="deleteDoc('verses','${doc.id}')">Delete</button></div>
+      </div>`;
+    }).join('');
+  }, err => console.error('verses listener failed', err));
+}
+function editVerse(id){
+  db.collection('verses').doc(id).get().then(doc=>{
+    if(!doc.exists) return;
+    const d=doc.data();
+    document.getElementById('vText').value=d.text||'';
+    document.getElementById('vRef').value=d.ref||'';
+    editingVerseId=id;
+    document.getElementById('vSaveBtn').textContent='Update Verse';
+    document.getElementById('vCancelBtn').style.display='block';
+    document.getElementById('versesSection').scrollIntoView({behavior:'smooth'});
+  }).catch(err=>alert('Failed to load: '+err.message));
+}
+function cancelVerseEdit(){
+  editingVerseId=null;
+  document.getElementById('vText').value='';
+  document.getElementById('vRef').value='';
+  document.getElementById('vSaveBtn').textContent='Add Verse';
+  document.getElementById('vCancelBtn').style.display='none';
+}
+function addVerse(){
+  const text=document.getElementById('vText').value.trim();
+  const ref=document.getElementById('vRef').value.trim();
+  if(!text){ alert('Enter the verse text'); return; }
+  if(!ref){ alert('Enter the reference, e.g. Joshua 1:9'); return; }
+  const data={ text, ref };
+  if (editingVerseId){
+    db.collection('verses').doc(editingVerseId).update(data)
+      .then(cancelVerseEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  } else {
+    db.collection('verses').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(cancelVerseEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  }
+}
+
+/* ══════════════════════════════════
+   WALLPAPERS
+══════════════════════════════════ */
+let unsubWall=null;
+function listenWallpapers(){
+  if (unsubWall) unsubWall();
+  unsubWall = db.collection('wallpapers').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const list=document.getElementById('wallpapersList');
+    if (snap.empty){ list.innerHTML=`<div class="empty">No admin wallpapers added yet.</div>`; return; }
+
+    // Group by tag so a category's wallpapers sit together instead of one
+    // long flat list — makes it much faster to find the one you want to edit.
+    const groups = {};
+    snap.docs.forEach(doc=>{
+      const d = doc.data();
+      const tag = (d.tag||'').trim() || 'Untagged';
+      (groups[tag] = groups[tag] || []).push({ id: doc.id, d });
+    });
+    const sortedTags = Object.keys(groups).sort((a,b)=>{
+      if (a==='Untagged') return 1;
+      if (b==='Untagged') return -1;
+      return a.localeCompare(b);
+    });
+    window._lastWallpaperTags = sortedTags.filter(t => t !== 'Untagged');
+    if (typeof renderWallpaperCovers === 'function') renderWallpaperCovers(window._lastWallpaperTags);
+
+    list.innerHTML = sortedTags.map(tag => `
+      <details class="wp-cat-group" open>
+        <summary class="wp-cat-group-head">${tag} <span class="wp-cat-group-count">${groups[tag].length}</span></summary>
+        ${groups[tag].map(({id,d})=>`
+          <div class="req-card">
+            <div class="req-title">"${d.q||''}"</div>
+            <div class="req-meta">— ${d.a||'Unknown'} · ${d.tag||''}<br>${d.url}</div>
+            <div class="req-actions"><button class="edit-btn" onclick="editWallpaper('${id}')">Edit</button><button class="reject-btn" onclick="deleteDoc('wallpapers','${id}')">Delete</button></div>
+          </div>
+        `).join('')}
+      </details>
+    `).join('');
+  });
+}
+/* ══════════════════════════════════
+   CATEGORY COVERS (quotes + wallpapers)
+   One custom cover image per category, stored in Firestore collection
+   "catCovers" — doc id "quote_<key>" for the 6 fixed quote categories,
+   "wallpaper_<slug>" for whatever wallpaper tags currently exist.
+══════════════════════════════════ */
+const QUOTE_CATS = [
+  {key:'motivation', label:'Motivation'},
+  {key:'love',       label:'Love'},
+  {key:'savage',     label:'Savage'},
+  {key:'success',    label:'Success'},
+  {key:'deep',       label:'Deep'},
+  {key:'captions',   label:'Captions'},
+  {key:'proverbs',   label:'Proverbs'},
+  {key:'bestlife',   label:'Best Life'},
+];
+function slugifyKey(s){ return String(s).toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/(^-|-$)/g,''); }
+
+let catCoversData = {};   // docId -> image url
+let unsubCatCovers = null;
+function listenCatCovers(){
+  if (unsubCatCovers) return; // already listening — data stays live from here on
+  unsubCatCovers = db.collection('catCovers').onSnapshot(snap=>{
+    catCoversData = {};
+    snap.forEach(doc => { catCoversData[doc.id] = (doc.data()||{}).img || ''; });
+    renderQuoteCovers();
+    renderWallpaperCovers(window._lastWallpaperTags || []);
+    renderHomeBannerCover();
+  }, err => {
+    console.error('catCovers listener failed', err);
+    ['quoteCoversList','wallpaperCoversList'].forEach(id=>{
+      const el = document.getElementById(id);
+      if (el && !el.innerHTML.trim()) el.innerHTML = `<div class="empty">⚠️ Couldn't load saved covers (${err.code||err.message}). Your Firestore security rules probably need a rule added for the "catCovers" collection. The rows below still work for saving new ones — refresh once your rules are updated.</div>`;
+    });
+  });
+}
+
+function catCoverRow(docId, label, currentImg){
+  const safe = slugifyKey(docId);
+  return `<div class="req-card" style="padding:14px;margin-bottom:10px">
+    <div style="font-weight:600;font-size:13px;margin-bottom:8px">${label}</div>
+    ${currentImg ? `<img src="${currentImg}" style="width:100%;max-height:110px;object-fit:cover;border-radius:8px;margin-bottom:8px"/>` : ''}
+    <label class="upload-box" style="padding:12px;margin-bottom:8px">
+      <input type="file" accept="image/*" onchange="uploadCoverImage(this,'${safe}')"/>
+      <div class="up-txt" style="font-size:11px">Tap to upload a cover image</div>
+    </label>
+    <div id="cov-status-${safe}" class="upload-status" style="display:none"></div>
+    <input id="cov-url-${safe}" value="${(currentImg||'').replace(/"/g,'&quot;')}" placeholder="or paste an image URL" style="width:100%;padding:10px;margin-bottom:8px;background:var(--ink3);border:1px solid var(--wire);border-radius:10px;color:var(--snow);font-size:12.5px;font-family:inherit"/>
+    <button class="btn" style="padding:10px" onclick="saveCatCover('${docId}','${safe}')">Save Cover</button>
+  </div>`;
+}
+
+function renderQuoteCovers(){
+  const el = document.getElementById('quoteCoversList');
+  if (!el) return;
+  el.innerHTML = QUOTE_CATS.map(c => catCoverRow('quote_'+c.key, c.label, catCoversData['quote_'+c.key])).join('');
+}
+
+function renderWallpaperCovers(tags){
+  const el = document.getElementById('wallpaperCoversList');
+  if (!el) return;
+  if (!tags.length){ el.innerHTML = `<div class="empty">Add some wallpapers first — categories show up here once they have at least one.</div>`; return; }
+  el.innerHTML = tags.map(tag => catCoverRow('wallpaper_'+slugifyKey(tag), tag, catCoversData['wallpaper_'+slugifyKey(tag)])).join('');
+}
+
+function renderHomeBannerCover(){
+  const el = document.getElementById('homeBannerCoverList');
+  if (!el) return;
+  el.innerHTML = catCoverRow('banner_home_wallpapers', 'Home banner image', catCoversData['banner_home_wallpapers']);
+}
+let pqDayData = {};
+function listenPQDay(){
+  db.collection('settings').doc('pictureQuoteOfDay').onSnapshot(doc=>{
+    pqDayData = doc.exists ? (doc.data()||{}) : {};
+    renderPQDay();
+  }, err => console.error('pictureQuoteOfDay listener failed', err));
+}
+function renderPQDay(){
+  const preview=document.getElementById('pqDayImgPreview');
+  const urlField=document.getElementById('pqDayImgUrl');
+  const textField=document.getElementById('pqDayText');
+  const authorField=document.getElementById('pqDayAuthor');
+  if(!preview) return;
+  preview.innerHTML = pqDayData.img ? `<img src="${pqDayData.img}" style="width:100%;max-height:160px;object-fit:cover;border-radius:8px;margin-bottom:8px"/>` : '';
+  if(urlField && !urlField.value) urlField.value = pqDayData.img || '';
+  if(textField && !textField.value) textField.value = pqDayData.q || '';
+  if(authorField && !authorField.value) authorField.value = pqDayData.a || '';
+}
+function uploadPQDayImage(input){
+  const file = input.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('pqDayStatus');
+  const urlField = document.getElementById('pqDayImgUrl');
+  if (CLOUDINARY_CLOUD_NAME === 'YOUR_CLOUD_NAME'){
+    statusEl.textContent = '⚠️ Cloudinary not set up — paste an image URL below instead.';
+    statusEl.style.display = 'block';
+    return;
+  }
+  statusEl.textContent = '⏳ Uploading…';
+  statusEl.style.display = 'block';
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body: formData })
+    .then(async r => {
+      const raw = await r.text();
+      let data; try { data = JSON.parse(raw); } catch(e) { data = null; }
+      if (r.ok && data?.secure_url){
+        urlField.value = data.secure_url;
+        statusEl.textContent = '✅ Uploaded — tap Save below to apply';
+      } else {
+        statusEl.textContent = '⚠️ Upload failed: ' + (data?.error?.message || raw.slice(0,150));
+      }
+    })
+    .catch(err => { statusEl.textContent = '⚠️ ' + err.message; });
+}
+function savePQDay(){
+  const img=document.getElementById('pqDayImgUrl').value.trim();
+  const q=document.getElementById('pqDayText').value.trim();
+  const a=document.getElementById('pqDayAuthor').value.trim() || 'Unknown';
+  if(!img){ alert('Upload or paste an image first'); return; }
+  if(!q){ alert('Enter the caption / quote text'); return; }
+  const statusEl = document.getElementById('pqDayStatus');
+  db.collection('settings').doc('pictureQuoteOfDay').set({ img, q, a, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+    .then(()=>{ statusEl.textContent = '✅ Saved — live on the app now'; statusEl.style.display = 'block'; })
+    .catch(err => alert('Failed: ' + err.message));
+}
+
+function uploadCoverImage(input, safeKey){
+  const file = input.files[0];
+  if (!file) return;
+  const statusEl = document.getElementById('cov-status-'+safeKey);
+  const urlField = document.getElementById('cov-url-'+safeKey);
+  if (CLOUDINARY_CLOUD_NAME === 'YOUR_CLOUD_NAME'){
+    statusEl.textContent = '⚠️ Cloudinary not set up — paste an image URL below instead.';
+    statusEl.style.display = 'block';
+    return;
+  }
+  statusEl.textContent = '⏳ Uploading…';
+  statusEl.style.display = 'block';
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+  fetch(`https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`, { method:'POST', body: formData })
+    .then(async r => {
+      const raw = await r.text();
+      let data; try { data = JSON.parse(raw); } catch(e) { data = null; }
+      if (r.ok && data?.secure_url){
+        urlField.value = data.secure_url;
+        statusEl.textContent = '✅ Uploaded — tap Save Cover to apply';
+      } else {
+        statusEl.textContent = '⚠️ Upload failed: ' + (data?.error?.message || raw.slice(0,150));
+      }
+    })
+    .catch(err => { statusEl.textContent = '⚠️ ' + err.message; });
+}
+
+function saveCatCover(docId, safeKey){
+  const url = document.getElementById('cov-url-'+safeKey).value.trim();
+  if (!url){ alert('Paste or upload an image first'); return; }
+  const statusEl = document.getElementById('cov-status-'+safeKey);
+  db.collection('catCovers').doc(docId).set({ img: url, updatedAt: firebase.firestore.FieldValue.serverTimestamp() })
+    .then(()=>{ statusEl.textContent = '✅ Saved'; statusEl.style.display = 'block'; })
+    .catch(err => alert('Failed: ' + err.message));
+}
+
+let editingWallpaperId=null;
+function editWallpaper(id){
+  db.collection('wallpapers').doc(id).get().then(doc=>{
+    if(!doc.exists) return;
+    const d=doc.data();
+    document.getElementById('wUrl').value=d.url||'';
+    document.getElementById('wQuote').value=d.q||'';
+    document.getElementById('wAuthor').value=d.a||'';
+    document.getElementById('wTag').value=d.tag||'';
+    editingWallpaperId=id;
+    document.getElementById('wSaveBtn').textContent='Update Wallpaper';
+    document.getElementById('wCancelBtn').style.display='block';
+    document.getElementById('wallpapersSection').scrollIntoView({behavior:'smooth'});
+  }).catch(err=>alert('Failed to load: '+err.message));
+}
+function cancelWallpaperEdit(){
+  editingWallpaperId=null;
+  document.getElementById('wUrl').value='';
+  document.getElementById('wQuote').value='';
+  document.getElementById('wAuthor').value='';
+  document.getElementById('wTag').value='';
+  document.getElementById('wPreview').style.display='none';
+  document.getElementById('wUploadStatus').style.display='none';
+  document.getElementById('wSaveBtn').textContent='Add Wallpaper';
+  document.getElementById('wCancelBtn').style.display='none';
+}
+function addWallpaper(){
+  const url=document.getElementById('wUrl').value.trim();
+  const q=document.getElementById('wQuote').value.trim();
+  const a=document.getElementById('wAuthor').value.trim() || (q ? 'Unknown' : '');
+  const tag=document.getElementById('wTag').value.trim() || (q ? 'Motivation' : '');
+  if(!url){ alert('Add an image first'); return; }
+  const data={ url, q, a, tag };
+  if (editingWallpaperId){
+    db.collection('wallpapers').doc(editingWallpaperId).update(data)
+      .then(cancelWallpaperEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  } else {
+    db.collection('wallpapers').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(cancelWallpaperEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  }
+}
+
+/* Matches wallpaper.html's own normalizeTag() so "romance", "Romance ",
+   "ROMANCE" etc. all match the same category regardless of exact
+   casing/spacing already stored on each wallpaper doc. */
+function normalizeWallTag(raw){
+  return (raw || 'Motivation').trim().replace(/\s+/g,' ')
+    .replace(/\w\S*/g, w => w[0].toUpperCase() + w.slice(1).toLowerCase());
+}
+function renameWallpaperCategory(fromTag, toTag){
+  fromTag = (fromTag||'').trim();
+  toTag = (toTag||'').trim();
+  if (!fromTag || !toTag){ alert('Enter both the current and new category name'); return; }
+  db.collection('wallpapers').get().then(snap => {
+    const matches = snap.docs.filter(doc => normalizeWallTag((doc.data()||{}).tag) === normalizeWallTag(fromTag));
+    if (!matches.length){ alert(`No wallpapers found tagged "${fromTag}".`); return; }
+    if (!confirm(`Rename ${matches.length} wallpaper${matches.length!==1?'s':''} from "${fromTag}" to "${toTag}"?\n\nNote: this only changes the category label — the pictures themselves stay the same.`)) return;
+    const batch = db.batch();
+    matches.forEach(doc => batch.update(doc.ref, { tag: toTag }));
+    batch.commit()
+      .then(()=> alert(`✅ Renamed ${matches.length} wallpaper${matches.length!==1?'s':''} to "${toTag}".`))
+      .catch(err=> alert('Failed: '+err.message));
+  }).catch(err=> alert('Failed: '+err.message));
+}
+
+/* ══════════════════════════════════
+   ADS — self-served ad slides, shown in the wallpaper reel and the
+   main site's quote feeds. Two Firestore pieces:
+     · collection "ads"          — one doc per ad creative
+     · doc "settings/adConfig"   — { enabled, frequency } global spacing
+   The site listens to both live, so publishing an ad here (or flipping
+   it active/inactive) shows up immediately with no redeploy.
+══════════════════════════════════ */
+function listenAdSettings(){
+  db.collection('settings').doc('adConfig').onSnapshot(doc=>{
+    const d = doc.data() || {};
+    document.getElementById('adEnabled').checked = d.enabled !== false;
+    document.getElementById('adFreq').value = d.frequency || 6;
+  }, err => console.error('adConfig listener failed', err));
+}
+function saveAdSettings(){
+  const enabled = document.getElementById('adEnabled').checked;
+  const frequency = Math.max(2, parseInt(document.getElementById('adFreq').value) || 6);
+  const statusEl = document.getElementById('adSettingsStatus');
+  db.collection('settings').doc('adConfig').set({ enabled, frequency }, { merge:true })
+    .then(()=>{ statusEl.textContent='✅ Saved'; setTimeout(()=>statusEl.textContent='',2000); })
+    .catch(err=>alert('Failed: '+err.message));
+}
+
+let unsubAds = null;
+let editingAdId = null;
+function listenAds(){
+  if (unsubAds) unsubAds();
+  unsubAds = db.collection('ads').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const list = document.getElementById('adsList');
+    if (snap.empty){ list.innerHTML = `<div class="empty">No ads added yet.</div>`; return; }
+    list.innerHTML = snap.docs.map(doc=>{
+      const d = doc.data(); const id = doc.id;
+      return `<div class="req-card">
+        <img src="${d.img}" style="width:100%;max-height:140px;object-fit:cover;border-radius:8px;margin-bottom:8px"/>
+        <div class="req-title">${d.label || 'Advertisement'}</div>
+        <div class="req-meta">→ ${d.linkUrl || ''}<br>Button: "${d.cta || 'Learn More'}"</div>
+        <div class="req-actions">
+          <button class="edit-btn" onclick="toggleAdActive('${id}', ${!!d.active})">${d.active ? '⏸️ Deactivate' : '▶️ Activate'}</button>
+          <button class="edit-btn" onclick="editAd('${id}')">Edit</button>
+          <button class="reject-btn" onclick="deleteDoc('ads','${id}')">Delete</button>
+        </div>
+      </div>`;
+    }).join('');
+  }, err => {
+    console.error('ads listener failed', err);
+    document.getElementById('adsList').innerHTML = `<div class="empty">⚠️ Couldn't load ads (${err.code||err.message}). Your Firestore security rules probably need a rule added for the "ads" collection.</div>`;
+  });
+}
+function toggleAdActive(id, cur){
+  db.collection('ads').doc(id).update({ active: !cur }).catch(err=>alert('Failed: '+err.message));
+}
+function editAd(id){
+  db.collection('ads').doc(id).get().then(doc=>{
+    if(!doc.exists) return;
+    const d = doc.data();
+    document.getElementById('adUrl').value = d.img || '';
+    document.getElementById('adLink').value = d.linkUrl || '';
+    document.getElementById('adLabel').value = d.label || '';
+    document.getElementById('adCta').value = d.cta || '';
+    document.getElementById('adActive').checked = d.active !== false;
+    editingAdId = id;
+    document.getElementById('adSaveBtn').textContent = 'Update Ad';
+    document.getElementById('adCancelBtn').style.display = 'block';
+    document.getElementById('adsSection').scrollIntoView({behavior:'smooth'});
+  }).catch(err=>alert('Failed to load: '+err.message));
+}
+function cancelAdEdit(){
+  editingAdId = null;
+  document.getElementById('adUrl').value = '';
+  document.getElementById('adLink').value = '';
+  document.getElementById('adLabel').value = '';
+  document.getElementById('adCta').value = '';
+  document.getElementById('adActive').checked = true;
+  document.getElementById('adPreview').style.display = 'none';
+  document.getElementById('adUploadStatus').style.display = 'none';
+  document.getElementById('adSaveBtn').textContent = 'Add Ad';
+  document.getElementById('adCancelBtn').style.display = 'none';
+}
+function addAd(){
+  const img = document.getElementById('adUrl').value.trim();
+  const linkUrl = document.getElementById('adLink').value.trim();
+  const label = document.getElementById('adLabel').value.trim() || 'Advertisement';
+  const cta = document.getElementById('adCta').value.trim() || 'Learn More';
+  const active = document.getElementById('adActive').checked;
+  if (!img){ alert('Add an image first'); return; }
+  if (!linkUrl){ alert('Add a link URL — where tapping the ad should go'); return; }
+  const data = { img, linkUrl, label, cta, active };
+  if (editingAdId){
+    db.collection('ads').doc(editingAdId).update(data)
+      .then(cancelAdEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  } else {
+    db.collection('ads').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(cancelAdEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  }
+}
+
+/* ══════════════════════════════════
+   MIGRATE BUILT-IN LESSONS
+   (copies the 3 lessons hardcoded in index.html's LEARN_TOPICS
+   into Firestore, using the same id, so they become editable here.
+   Skips any id that already exists — safe to run more than once.)
+══════════════════════════════════ */
+const BUILT_IN_LESSONS = [
+  {
+    id:'biz-strategy', icon:'💼', tag:'Strategy', price:750,
+    title:'Business Strategy for the Nigerian Market',
+    blurb:'How small operators actually win against bigger competitors — pricing, positioning, and the moves nobody tells you about.',
+    pages:[
+      {title:'Why "Working Hard" Isn\u2019t a Strategy', free:true,
+        content:`<p>Every market woman in Balogun, every roadside mechanic in Alaba, every phone repairer in Computer Village is working hard. Hard work is the entry fee — it isn't the strategy. If working hard was enough to win, the busiest person in every market would also be the richest. That's rarely true.</p><h4>The Real Question</h4><p>Strategy is not "how do I work harder" — it's "where do I place myself so effort actually compounds." Two traders can sell the exact same phone case. One is broke in 5 years. The other owns three shops. The difference was never effort. It was positioning, pricing discipline, and who they built relationships with.</p><h4>What This Topic Covers</h4><p>Over the next few pages, we'll go through concrete, usable strategy: how to price so you're not the cheapest and still win, how to pick a lane your competitors haven't crowded, and a real case study of a Lagos business that used exactly this to grow from one stall to a small chain.</p>`,
+        apply:'Write down what makes your business different from the 3 closest competitors near you. If you can\u2019t name one thing in 60 seconds, that\u2019s your first problem to solve this week.'},
+      {title:'The Pricing Trap Every Beginner Falls Into', free:true,
+        content:`<p>New business owners almost always underprice. The logic feels right: "I'm new, nobody knows me, so I'll charge less to attract customers." It feels safe. It's actually one of the most expensive mistakes in business.</p><h4>Why Cheap Doesn't Win Loyalty</h4><p>Customers who come only for your low price will leave the moment someone prices lower. You haven't built loyalty — you've built a bidding war you'll eventually lose, because there's always someone willing to go lower and survive on thinner margins than you.</p><h4>What Wins Instead</h4><p>Reliability, speed, and trust win loyalty. A customer who knows you'll deliver exactly what you promised, on time, every time, will pay more to keep working with you — because switching to someone unproven is a risk they don't want to take.</p><p>The next pages go deeper: how to actually calculate a price that protects your margin, a full breakdown of the Lagos case study, and the specific credibility signals that let you charge more without losing customers.</p>`,
+        apply:'Check your current prices against your true cost (materials + time + transport). If your margin is under 25%, you are pricing for survival, not growth.'},
+      {title:'The Lagos Shoe Seller Case Study', free:false,
+        content:`<p>[Gated — full Nigerian case study on how a single shoe stall in Yaba used a narrow niche and word-of-mouth trust to outgrow three competitors, including the exact pricing and supplier moves made in year one and two.]</p>`,
+        apply:''},
+      {title:'Building a Niche Nobody Else Owns', free:false,
+        content:`<p>[Gated — a step-by-step framework for finding an underserved niche in a crowded Nigerian market, with worked examples from fashion, food, and services.]</p>`,
+        apply:''},
+      {title:'Turning First-Time Buyers Into Repeat Customers', free:false,
+        content:`<p>[Gated — the specific follow-up system (WhatsApp-based, zero-cost) that turns one-time buyers into repeat customers, with message templates.]</p>`,
+        apply:''},
+    ]
+  },
+  {
+    id:'general-knowledge', icon:'🧠', tag:'General Knowledge', price:500,
+    title:'General Knowledge Facts That Sharpen How You Think',
+    blurb:'Bite-sized facts across history, money, and the world — the kind that make you sound like the smartest person in the room.',
+    pages:[
+      {title:'Money Facts Nobody Taught You in School', free:true,
+        content:`<p>Inflation is not just "prices going up" — it's your money quietly losing power to buy the same things over time. If ₦1,000 could buy a bag of rice ten years ago and now buys half a bag, your money didn't change. Its power did. This is why saving cash alone, without any form of growth, slowly loses you money even while the number in your account stays the same.</p><h4>Compound Interest, Explained Simply</h4><p>Compound interest is interest earning interest. Save ₦10,000 at 10% yearly, and after year one you have ₦11,000. Year two you earn 10% on ₦11,000, not just the original ₦10,000. Small, but over 10–20 years this difference becomes enormous. It's the single biggest reason to start early, even with small amounts.</p>`,
+        apply:'Look at one thing you spend money on weekly out of habit, not need. Calculate what it costs you in a year. That number is usually bigger than people expect.'},
+      {title:'History Facts That Explain Today', free:true,
+        content:`<p>Many of the borders in modern Africa were drawn by European powers in the late 1800s, often without regard for existing kingdoms, languages, or ethnic groups. Understanding this single fact explains a huge amount about regional tension and diversity across the continent today — it wasn't accidental complexity, it was inherited complexity.</p><h4>Why This Matters Practically</h4><p>Knowing the "why" behind current events — economic, political, or social — makes you far harder to manipulate with surface-level takes. People who understand root causes make better decisions and ask better questions.</p><p>The next pages cover deeper knowledge across science, geography, and global economics — the kind of facts that make conversations, negotiations, and decisions sharper.</p>`,
+        apply:'Pick one current news topic you have an opinion on. Spend 10 minutes researching its actual history before your next conversation about it.'},
+      {title:'Science Facts That Change How You See the World', free:false, content:`<p>[Gated content.]</p>`, apply:''},
+      {title:'Global Economics in Plain Language', free:false, content:`<p>[Gated content.]</p>`, apply:''},
+    ]
+  },
+  {
+    id:'ajo-credit', icon:'🤝', tag:'Credit & Trust', price:1050,
+    title:'Ajo, Esusu & the Future of Credit in Nigeria',
+    blurb:'How rotating savings groups work, why they still beat many banks on trust, and how a credit history could be built from them.',
+    pages:[
+      {title:'What Ajo Actually Is (And Why It Still Works)', free:true,
+        content:`<p>Ajo — also called Esusu in some regions — is a rotating savings arrangement where a group of people each contribute a fixed amount regularly, and one member receives the full pooled amount on a rotating basis. It has existed in Nigeria for generations, long before formal banking reached most communities.</p><h4>Why It Survives Alongside Modern Banking</h4><p>Ajo works because it runs on something banks struggle to replicate at scale: personal trust between people who know each other. There's no interest charged, no paperwork, and the social pressure to keep contributing is often stronger than any bank's collection process.</p>`,
+        apply:'If you\u2019re not already in a savings group, ask two people you trust this week whether they\u2019d be open to starting one.'},
+      {title:'The Gap Ajo Doesn\u2019t Solve', free:true,
+        content:`<p>Ajo builds savings discipline and community trust — but it does nothing for your formal credit history. If you've faithfully contributed to an ajo for five years without missing a payment, that discipline is invisible to any bank or lender, because it was never recorded anywhere they can see.</p><h4>Where This Is Heading</h4><p>There's a growing opportunity to bridge informal trust-based savings with formal credit visibility — recording consistent contribution behavior in a way that could one day support loan applications, without removing the community trust that makes ajo work in the first place.</p><p>The remaining pages cover how digital record-keeping for ajo groups could work in practice, and what a credit-history layer built on top of it might look like.</p>`,
+        apply:'Write down how long you\u2019ve been contributing to any group savings, and whether you\u2019ve ever missed a round. That record — informally — is worth more than most people realize.'},
+      {title:'Digitizing Trust Without Killing It', free:false, content:`<p>[Gated content.]</p>`, apply:''},
+      {title:'What a Credit-History Layer Could Look Like', free:false, content:`<p>[Gated content.]</p>`, apply:''},
+      {title:'Risks: What Could Go Wrong', free:false, content:`<p>[Gated content.]</p>`, apply:''},
+      {title:'The Opportunity for Builders', free:false, content:`<p>[Gated content.]</p>`, apply:''},
+    ]
+  },
+];
+/* ══════════════════════════════════
+   SEED STARTER WALLPAPERS
+   (a handful of real, curated starter wallpapers for categories that don't
+   have any yet — Unsplash License, free to use. Each becomes a normal
+   Firestore wallpaper doc: fully editable, replaceable, deletable like any
+   other. Uses a stable id per image so it's safe to tap more than once.)
+══════════════════════════════════ */
+const STARTER_WALLPAPERS = [
+{ id:'builtin-wp-0', url:'pic241.jpg', q:'Gotta win sometimes\nwhen you always lose.', a:'Juice WRLD', tag:'Multiverse' },
+  { id:'builtin-wp-1', url:'pic251.jpg', q:'Make money\nwhile you sleep\nor work until you die.', a:'Warren Buffett', tag:'Finance' },
+  { id:'builtin-wp-2', url:'pic261.jpg', q:'She said she\'d never\nfall again. But whispered\nto the night, I lied.', a:'Unknown', tag:'Life' },
+  { id:'builtin-wp-3', url:'https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80', q:'They didn\'t ignore you.\nThey showed you\nwho they are.', a:'Maya Angelou', tag:'Multiverse' },
+  { id:'builtin-wp-4', url:'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=900&q=80', q:'Your network\nis your net worth.\nChoose wisely.', a:'Tim Sanders', tag:'Finance' },
+  { id:'builtin-wp-5', url:'pic24.jpg', q:'', a:'', tag:'Hustle' },
+  { id:'builtin-wp-6', url:'https://images.unsplash.com/photo-1519834785169-98be25ec3f84?w=900&q=80', q:'Stop waiting for Friday.\nBuild a life\nyou don\'t need to escape.', a:'Unknown', tag:'Hustle' },
+  { id:'builtin-wp-7', url:'pic25.jpg', q:'', a:'', tag:'Finance' },
+  { id:'builtin-wp-8', url:'https://images.unsplash.com/photo-1501854140801-50d01698950b?w=900&q=80', q:'Not everyone\nwho lost you\nwas worth keeping.', a:'Unknown', tag:'Multiverse' },
+  { id:'builtin-wp-9', url:'https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=900&q=80', q:'They sleep.\nYou grind.\nThat\'s the difference.', a:'Unknown', tag:'Hustle' },
+  { id:'builtin-wp-10', url:'https://images.unsplash.com/photo-1441974231531-c6227db76b6e?w=900&q=80', q:'Invest in yourself.\nIt\'s the best market\nthat will never crash.', a:'Warren Buffett', tag:'Finance' },
+  { id:'builtin-wp-11', url:'https://images.unsplash.com/photo-1518020382113-a7e8fc38eac9?w=900&q=80', q:'Silence is the loudest\nanswer you\'ll\never receive.', a:'Unknown', tag:'Life' },
+  { id:'builtin-wp-12', url:'https://images.unsplash.com/photo-1526506118085-60ce8714f8c5?w=900&q=80', q:'Nobody cares\nabout your excuses.\nOnly your results.', a:'Unknown', tag:'Hustle' },
+  { id:'builtin-wp-13', url:'https://images.unsplash.com/photo-1483721310020-03333e577078?w=900&q=80', q:'The goal is to die\nwith memories,\nnot dreams.', a:'Unknown', tag:'Life' },
+  { id:'builtin-wp-14', url:'pic1.jpg', q:'you can miss someone\nand still not .\nwant them back.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-15', url:'pic2.jpg', q:'you saw the \ntruth now.\nmove on.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-16', url:'pic3.jpg', q:'they switch \nwhen you needed.\nthem most.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-17', url:'pic4.jpg', q:'you can\'t\ncheat.\nconsistency.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-18', url:'pic5.jpg', q:'focus on\nbecoming.\nnot proving.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-19', url:'pic6.jpg', q:'you learn \nwho matters when.\nyou\'re down.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-20', url:'pic7.jpg', q:'you survived\nbut you\'re not.\nthe same.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-21', url:'pic8.jpg', q:'pain\nchanges you.\nquietly.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-22', url:'pic9.jpg', q:'you felt\nit they.\ndidn\'t.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-23', url:'pic10.jpg', q:'loyalty is\nrare.\nnot normal.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-24', url:'pic11.jpg', q:'No risk\nNo.\nreward.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-25', url:'pic12.jpg', q:'stay hungry\nor.\nstay average.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-26', url:'pic13.jpg', q:'consistency beats\ntalent.\n.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-27', url:'pic14.jpg', q:'you either\nwork or\nwish.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-28', url:'pic15.jpg', q:'life won\'t give you\nwhat you want,\nbut what you deserve.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-29', url:'pic16.jpg', q:'some wounds\ndon\'t show.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-30', url:'pic17.jpg', q:'Healing is \nlonely.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-31', url:'pic18.jpg', q:'Discipline \nbeats motivation.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-32', url:'pic19.jpg', q:'you become what \nyou repeat.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-33', url:'pic20.jpg', q:'move different \nthink different.', a:'Daniel', tag:'Real' },
+  { id:'builtin-wp-34', url:'pic21.jpg', q:'Hate being broke,\nbut love the grind.', a:'21 savage', tag:'Real' },
+  { id:'builtin-wp-35', url:'pic22.jpg', q:'Reality is wrong.\nDreams are for real', a:'Tupac Shakur', tag:'Real' },
+  { id:'builtin-wp-36', url:'pic23.jpg', q:'sometimes life is a mess,\nbut you keep going', a:'juice wrld', tag:'Real' },
+{ id:'seed-ladies-1', url:'https://images.unsplash.com/photo-1749143351301-cdc34d75518b?w=900&q=80',
+    q:'Soft is not weak. Soft is a woman who healed and chose grace anyway.', a:'Daniel Wisdom Hub', tag:'Sport' },
+  { id:'seed-ladies-2', url:'https://images.unsplash.com/photo-1750700381137-89182938acff?w=900&q=80',
+    q:'She carries fire in her spirit and peace in her eyes.', a:'Daniel Wisdom Hub', tag:'Sport' },
+  { id:'seed-romance-1', url:'https://images.unsplash.com/photo-1562859892-e20abcecc099?w=900&q=80',
+    q:"Love isn't loud promises. It's quiet hands that stay.", a:'Daniel Wisdom Hub', tag:'Cars' },
+  { id:'seed-faith-1', url:'https://images.unsplash.com/photo-1747738609473-9e92707075eb?w=900&q=80',
+    q:"Faith doesn't remove the storm. It anchors you inside it.", a:'Daniel Wisdom Hub', tag:'Faith' },
+  { id:'seed-solitude-1', url:'https://images.unsplash.com/photo-1506748686214-e9df14d4d9d0?w=900&q=80',
+    q:'Some of the loudest growth happens in the quietest rooms.', a:'Daniel Wisdom Hub', tag:'Solitude' },
+];
+function seedStarterWallpapers(){
+  const statusEl = document.getElementById('seedWallStatus');
+  statusEl.textContent = '⏳ Checking…';
+  const batch = db.batch();
+  let toAdd = 0, skipped = 0;
+  const checks = STARTER_WALLPAPERS.map(w =>
+    db.collection('wallpapers').doc(w.id).get().then(doc => {
+      if (doc.exists) { skipped++; return; }
+      const { id, ...data } = w;
+      batch.set(db.collection('wallpapers').doc(id), { ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      toAdd++;
+    })
+  );
+  Promise.all(checks).then(() => {
+    if (toAdd === 0) { statusEl.textContent = `✅ Already seeded — ${skipped} found, nothing to do`; return; }
+    batch.commit()
+      .then(() => { statusEl.textContent = `✅ Added ${toAdd} wallpaper(s)${skipped ? `, ${skipped} already existed` : ''} — scroll down to see them`; })
+      .catch(err => { statusEl.textContent = '⚠️ Failed: ' + err.message; });
+  }).catch(err => { statusEl.textContent = '⚠️ Failed: ' + err.message; });
+}
+
+const BUILT_IN_ARTICLES = [
+  {id:'builtin-art-1',cat:'deep',
+   title:'10 Ancient Wisdom Principles That Still Work Today',
+   preview:'From Stoic philosophy to Confucian thought, these timeless principles guide modern life.',
+   img:'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
+   content:`<h3>Introduction</h3><p>Ancient wisdom has survived millennia because it speaks to the unchanging core of human experience. The sages of antiquity walked the paths we now walk — and left maps.</p><h3>1. Memento Mori</h3><p>The Stoics reminded themselves daily of mortality — not morbidly, but as a catalyst for intentional living. When you know time is finite, trivial distractions lose their grip.</p><h3>2. The Middle Path</h3><p>Buddha taught balance above all. Extremism in any form leads to suffering. The flourishing life lives in equilibrium.</p><h3>3. Know Thyself</h3><p>Inscribed at Delphi, this command launched a tradition of self-inquiry that remains the foundation of all psychological and spiritual growth.</p><h3>Conclusion</h3><p>Ancient wisdom endures not because it is old, but because it is true. Begin with one principle today.</p>`
+  },
+  {id:'builtin-art-2',cat:'success',
+   title:'The Science of Daily Habits That Build Extraordinary Lives',
+   preview:'Neuroscience reveals how tiny daily rituals compound into remarkable transformation.',
+   img:'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80',
+   content:`<h3>Why Habits Matter</h3><p>Your habits are the compound interest of self-improvement. Tiny daily actions, repeated consistently, produce results that appear miraculous to outsiders.</p><h3>The 1% Rule</h3><p>Getting 1% better each day means being 37× better by year's end. The math is real. So is the discipline required.</p><h3>Keystone Habits</h3><p>Some habits unlock a cascade of other positive behaviors. Exercise, journaling, and sleep are proven keystones. Start there.</p><h3>Conclusion</h3><p>Build the habit first. The results will follow. Every master was once a beginner with a simple daily practice.</p>`
+  },
+  {id:'builtin-art-3',cat:'love',
+   title:'How Love Transforms the Human Experience',
+   preview:'The deepest insights about love from philosophers, poets, and modern psychology.',
+   img:'https://images.unsplash.com/photo-1444464666168-49d633b86797?w=800&q=80',
+   content:`<h3>Love as a Practice</h3><p>Love is not merely a feeling — it is a verb, a discipline, a daily choice renewed in small acts of attention and care.</p><h3>The Ancient Greeks Had It Right</h3><p>They distinguished Eros (passion), Philia (friendship), Storge (family), and Agape (universal love). Most relationships need all four.</p><h3>Conclusion</h3><p>Love boldly. The risk of loving is always worth taking.</p>`
+  },
+  {id:'builtin-art-4',cat:'motivation',
+   title:'Why Discipline Beats Motivation Every Single Time',
+   preview:'Motivation is a feeling. Discipline is a system. Here is how to build the one that actually lasts.',
+   img:'https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&q=80',
+   content:`<h3>The Motivation Trap</h3><p>Motivation is unreliable. It arrives uninvited and leaves without notice. Building your life around it means your progress depends on how you feel — which is exactly backwards.</p><h3>Discipline Is a Skill</h3><p>Unlike motivation, discipline is trainable. You build it the same way you build muscle: through repeated, intentional use. Start small. Show up when you don't want to. That's the whole practice.</p><h3>Systems Over Goals</h3><p>Goals are destinations. Systems are the roads that get you there. Every person who achieves anything extraordinary has a system — a daily non-negotiable that runs regardless of mood.</p><h3>Conclusion</h3><p>Stop waiting to feel ready. Build the system. The feeling follows the action, not the other way around.</p>`
+  },
+  {id:'builtin-art-5',cat:'savage',
+   title:'The Power of Walking Away: Why Letting Go Is Strength',
+   preview:'Most people stay too long in situations that no longer serve them. Here is why leaving is the bravest thing you can do.',
+   img:'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&q=80',
+   content:`<h3>The Sunk Cost Trap</h3><p>Humans are wired to stay. We confuse the time we've already spent with a reason to keep going. This is called the sunk cost fallacy — and it destroys more potential than failure ever could.</p><h3>Walking Away Is Not Failure</h3><p>Knowing when to leave — a job, a relationship, a belief system — is one of the rarest and most powerful skills a person can develop. It requires brutal honesty and extraordinary courage.</p><h3>What You Leave Behind</h3><p>Every time you walk away from what is wrong for you, you make space for what is right. The people who seem to have everything simply got very good at removing what they didn't need.</p><h3>Conclusion</h3><p>Let go. Not because it's easy — but because you're worth what comes after.</p>`
+  },
+  {id:'builtin-art-6',cat:'deep',
+   title:'The Quiet Life: Why Stillness Is the New Superpower',
+   preview:'In a world addicted to noise, the person who masters silence gains an extraordinary edge.',
+   img:'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
+   content:`<h3>We Are Afraid of Silence</h3><p>Most people fill every quiet moment with noise — scrolling, talking, consuming. Not because they enjoy it, but because they are afraid of what silence reveals.</p><h3>What Stillness Teaches</h3><p>In silence, you hear your actual thoughts. Your real desires. The things you've been avoiding. This is not comfortable. It is necessary.</p><h3>The Competitive Edge</h3><p>While everyone else is reacting, the still person is responding. While everyone else is consuming, the still person is creating. Stillness is not passivity — it is the foundation of all great action.</p><h3>Conclusion</h3><p>Sit with yourself. Start with five minutes. What you find there is the beginning of everything important.</p>`
+  },
+  {id:'builtin-art-7',cat:'success',
+   title:'How to Build Wealth With Any Income',
+   preview:'Wealth is not about how much you earn. It is about the gap between what you earn and what you spend.',
+   img:'https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=800&q=80',
+   content:`<h3>The Income Trap</h3><p>Most people believe wealth requires a high income. This is false. Lottery winners go broke. High earners stay broke. The variable that matters is not income — it is the relationship between income and lifestyle.</p><h3>The Wealth Gap</h3><p>Wealth is what you don't spend. Every naira, dollar, or pound you don't convert into lifestyle is a unit of future freedom. The wealthy understand this. The broke wish they had.</p><h3>Three Principles</h3><p>First: spend less than you earn. Second: invest the difference consistently. Third: wait. Compound interest is the closest thing to a financial miracle that actually exists.</p><h3>Conclusion</h3><p>You don't need more money. You need a better relationship with the money you already have.</p>`
+  },
+  {id:'builtin-art-8',cat:'mindset',
+   title:'You Are Not Your Thoughts: The Art of Mental Detachment',
+   preview:'Learning to observe your thoughts instead of being controlled by them is the most liberating skill you will ever develop.',
+   img:'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=800&q=80',
+   content:`<h3>The Voice in Your Head</h3><p>You have a constant internal narrator. It criticizes, fears, catastrophizes, and compares. Most people believe every word it says. This is the source of nearly all unnecessary suffering.</p><h3>The Observer</h3><p>Between a thought and your reaction to it, there is a space. In that space lies your freedom. When you learn to observe a thought rather than become it, everything changes.</p><h3>The Practice</h3><p>Notice the thought. Name it: "I'm having the thought that I'm not good enough." That act of naming creates distance. The thought is still there — but it no longer runs the show.</p><h3>Conclusion</h3><p>You are not your thoughts. You are the one noticing them. That distinction changes everything.</p>`
+  },
+  {id:'builtin-art-9',cat:'love',
+   title:'Why Self-Love Is Not Selfish: A Guide to Loving Yourself First',
+   preview:'You cannot pour from an empty cup. Self-love is not vanity — it is the foundation of every good relationship.',
+   img:'https://images.unsplash.com/photo-1474511320723-9a56873867b5?w=800&q=80',
+   content:`<h3>The Misconception</h3><p>We are taught that putting ourselves first is selfish. This teaching is responsible for generations of burned-out, resentful, empty people who gave everything they had and had nothing left — not even for themselves.</p><h3>What Self-Love Actually Is</h3><p>Self-love is not bubble baths and affirmations. It is setting boundaries. It is leaving relationships that diminish you. It is choosing rest over approval. It is the hardest, most important practice of your life.</p><h3>The Overflow Principle</h3><p>When you love yourself — truly, not performatively — you overflow. You give from abundance, not from fear. The quality of every relationship in your life improves automatically.</p><h3>Conclusion</h3><p>Start with you. Not because others don't matter — but because you do.</p>`
+  },
+  {id:'builtin-art-10',cat:'captions',
+   title:'Words That Hit Different: 50 Captions for Your Best Moments',
+   preview:'The right caption turns a good photo into a statement. Here are 50 that actually say something.',
+   img:'https://images.unsplash.com/photo-1529156069898-49953e39b3ac?w=800&q=80',
+   content:`<h3>For the Quiet Confidence</h3><p>"Unbothered. Moisturized. Thriving." / "Not chasing — attracting." / "Main character. Always." / "My peace is non-negotiable."</p><h3>For the Glow Up</h3><p>"She's not the same girl. Thank God." / "Becoming is better than being." / "The upgrade was internal first." / "New level. New energy. New me."</p><h3>For the Hard Days</h3><p>"Still here. Still standing. Still going." / "Healing isn't linear but it's happening." / "God's timing > my timeline." / "I didn't come this far to only come this far."</p><h3>For the Celebration</h3><p>"This took everything I had. Worth it." / "Exactly where I'm supposed to be." / "Look at what we built." / "The vision becomes the reality."</p><h3>Conclusion</h3><p>Choose words that match where you're going, not just where you've been.</p>`
+  },
+  {id:'builtin-art-11',cat:'wisdom',
+   title:'The 5 Stoic Lessons That Will Rewire How You Think',
+   preview:'The Stoics solved problems we still struggle with. Their answers are as relevant now as they were 2,000 years ago.',
+   img:'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=800&q=80',
+   content:`<h3>1. Control What You Can</h3><p>The Stoics divided the world into two categories: things within our control (thoughts, responses, choices) and things outside it (opinions, weather, other people). All suffering, they argued, comes from confusing the two.</p><h3>2. The Obstacle Is the Way</h3><p>Marcus Aurelius: "The impediment to action advances action. What stands in the way becomes the way." Every obstacle is an opportunity in disguise — but only if you look at it that way.</p><h3>3. Amor Fati</h3><p>Love your fate. Not just accept it — love it. Every hardship, every loss, every failure is raw material for a stronger character. This is not resignation. It is radical ownership.</p><h3>4. Premeditatio Malorum</h3><p>Premeditate the worst. Imagine what could go wrong before it does. This sounds pessimistic. It is actually the opposite — it removes fear's power by making the worst case familiar.</p><h3>5. Live as If Today Is Your Last</h3><p>Not recklessly — deliberately. With presence. With gratitude. With attention to what actually matters.</p><h3>Conclusion</h3><p>You don't need a philosophy degree to be a Stoic. You just need to start practicing today.</p>`
+  },
+  {id:'builtin-art-12',cat:'motivation',
+   title:'Start Before You\'re Ready: The Case for Imperfect Action',
+   preview:'Waiting until you are ready is the most sophisticated form of self-sabotage ever invented.',
+   img:'https://images.unsplash.com/photo-1499951360447-b19be8fe80f5?w=800&q=80',
+   content:`<h3>The Readiness Myth</h3><p>Readiness is not a state you arrive at. It is a state you build through action. No one who has ever done anything worthwhile felt ready first. They started anyway. Readiness followed.</p><h3>Why We Wait</h3><p>We wait because starting makes failure possible. And failure is uncomfortable. So we dress up our fear as prudence — "I just need a bit more preparation" — and watch years pass.</p><h3>The 80% Rule</h3><p>When you have 80% of the information you need, act. The remaining 20% only becomes available through doing. Perfectionists never ship. Imperfect shippers change the world.</p><h3>Conclusion</h3><p>Start ugly. Start scared. Start small. But start. The version of you that finishes is built entirely by the version of you that begins.</p>`
+  },
+  {id:'builtin-art-13',cat:'savage',
+   title:'Stop Explaining Yourself: Why the Unbothered Win',
+   preview:'Every time you explain yourself to someone who didn\'t ask, you give away power you can\'t afford to lose.',
+   img:'https://images.unsplash.com/photo-1508739773434-c26b3d09e071?w=800&q=80',
+   content:`<h3>The Explanation Trap</h3><p>There is a compulsive need many people have to justify their choices to others — their diet, their relationships, their career, their boundaries. This compulsion is rooted in seeking approval. And approval-seeking is the enemy of self-respect.</p><h3>Who Actually Needs an Explanation</h3><p>Very few people. If you hurt someone: explain and apologize. If a collaboration requires alignment: explain. Everyone else? They are not entitled to the interior of your decision-making.</p><h3>The Power of Silence</h3><p>"No" is a complete sentence. So is "I've decided." The urge to fill silence with justification is one to resist. Let people wonder. Let them form their own conclusions. You don't live in their conclusions — you live in your results.</p><h3>Conclusion</h3><p>Do the thing. Move in silence. Explain when it matters. Ignore when it doesn't.</p>`
+  },
+  {id:'builtin-art-14',cat:'deep',
+   title:'The Art of Sitting With Uncertainty',
+   preview:'Certainty is comfortable. Uncertainty is where growth lives. Learning to tolerate the unknown is a life skill most people never develop.',
+   img:'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?w=800&q=80',
+   content:`<h3>Why We Fear Uncertainty</h3><p>The brain treats uncertainty like a physical threat. It releases the same stress chemicals whether you're facing a lion or an unanswered email. This is not weakness — it is biology. But biology is not destiny.</p><h3>The Certainty Illusion</h3><p>Most of what you think you know is a story your brain constructed to feel safe. The past is rewritten constantly. The future is invented. Only this moment is real — and it is inherently uncertain.</p><h3>Building Tolerance</h3><p>Expose yourself to small uncertainties deliberately. Make a decision without researching it to death. Take a trip without an itinerary. These small practices build the muscle needed for the larger unknowns life inevitably delivers.</p><h3>Conclusion</h3><p>Uncertainty is not the problem. It is the terrain. Learn to move through it and you can go anywhere.</p>`
+  },
+  {id:'builtin-art-15',cat:'success',
+   title:'The Compound Effect: Why Nothing Happens and Then Everything Does',
+   preview:'Progress is invisible until it isn\'t. Understanding compounding changes how you measure every single day.',
+   img:'https://images.unsplash.com/photo-1563986768609-322da13575f3?w=800&q=80',
+   content:`<h3>The Disappointment Gap</h3><p>Most people quit in the valley between starting and seeing results. They do the right things for weeks or months, see nothing, conclude it isn't working, and stop. This is where dreams die — not from failure, but from impatience.</p><h3>How Compounding Actually Works</h3><p>Progress is exponential, not linear. For a long time, almost nothing changes. Then — seemingly overnight — everything does. The people who succeed are not more talented. They simply stayed long enough to reach the inflection point.</p><h3>The Daily Question</h3><p>Not "did I make progress today?" but "did I do the thing today?" On most days, the answer to the first question is no. The answer to the second question is all that matters.</p><h3>Conclusion</h3><p>Trust the process — not as a platitude, but as a mathematical reality. Keep going. The compound effect is working whether you can see it or not.</p>`
+  },
+  {id:'builtin-art-16',cat:'mindset',
+   title:'How to Stop Caring What People Think (Without Becoming a Sociopath)',
+   preview:'There is a version of not caring what people think that is liberating. And a version that is just isolation. Here is how to find the right one.',
+   img:'https://images.unsplash.com/photo-1516979187457-637abb4f9353?w=800&q=80',
+   content:`<h3>The Two Extremes</h3><p>On one end: desperately seeking everyone's approval, contorting yourself to be liked, losing yourself in the process. On the other: complete indifference to all feedback, unable to receive love or correction, isolated by pride. Neither is freedom.</p><h3>The Middle Path</h3><p>Care deeply about the opinions of people whose judgment you respect, who know you well, and who want what's best for you. These people are rare. Probably fewer than five.</p><h3>The Test</h3><p>Before letting an opinion affect you, ask: Do I respect this person's judgment? Do they have relevant experience? Do they want me to succeed? If the answer to any of these is no — the opinion is not data. It is noise.</p><h3>Conclusion</h3><p>Be discerning, not dismissive. A few right opinions, heard clearly, are worth more than the noise of thousands.</p>`
+  },
+  {id:'builtin-art-17',cat:'love',
+   title:'On Heartbreak: What Loss Actually Teaches You About Love',
+   preview:'Every heartbreak carries a curriculum. Most people drop the class before the lesson lands.',
+   img:'https://images.unsplash.com/photo-1546182990-dffeafbe841d?w=800&q=80',
+   content:`<h3>The Gift Nobody Wants</h3><p>Heartbreak is the most efficient teacher you will ever have. It teaches you what you value, what you tolerate, what you need, and what you're capable of surviving — all at once, all in the most painful possible way. This is the gift. Wrapped terribly.</p><h3>What the Pain Is Saying</h3><p>The depth of grief is proportional to the depth of love. When it hurts that much, it means something real was there. That's worth honoring, not suppressing.</p><h3>The Curriculum</h3><p>What did this relationship reveal about your patterns? Your attachment style? The standards you need to hold? Every heartbreak, examined honestly, makes the next love better — not because you guard yourself more, but because you know yourself more.</p><h3>Conclusion</h3><p>Let it hurt. Let it teach. Then let it go — not by forgetting, but by growing past the shape it left in you.</p>`
+  },
+];
+
+function migrateBuiltInArticles(){
+  const statusEl=document.getElementById('migrateArticlesStatus');
+  statusEl.textContent='⏳ Checking…';
+  const batch=db.batch();
+  let toAdd=0, skipped=0;
+  const checks=BUILT_IN_ARTICLES.map(article=>
+    db.collection('articles').doc(article.id).get().then(doc=>{
+      if(doc.exists){ skipped++; return; }
+      const { id, ...data } = article;
+      batch.set(db.collection('articles').doc(id), { ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      toAdd++;
+    })
+  );
+  Promise.all(checks).then(()=>{
+    if(toAdd===0){ statusEl.textContent=`✅ Already migrated — ${skipped} article(s) found, nothing to do`; return; }
+    batch.commit()
+      .then(()=>{ statusEl.textContent=`✅ Migrated ${toAdd} article(s)${skipped?`, ${skipped} already existed`:''} — scroll down to see them`; })
+      .catch(err=>{ statusEl.textContent='⚠️ Failed: '+err.message; });
+  }).catch(err=>{ statusEl.textContent='⚠️ Failed: '+err.message; });
+}
+
+function migrateBuiltInLessons(){
+  const statusEl=document.getElementById('migrateStatus');
+  statusEl.textContent='⏳ Checking…';
+  const batch=db.batch();
+  let toAdd=0, skipped=0;
+  const checks=BUILT_IN_LESSONS.map(topic=>
+    db.collection('learningTopics').doc(topic.id).get().then(doc=>{
+      if(doc.exists){ skipped++; return; }
+      const { id, ...data } = topic;
+      batch.set(db.collection('learningTopics').doc(id), { ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() });
+      toAdd++;
+    })
+  );
+  Promise.all(checks).then(()=>{
+    if(toAdd===0){ statusEl.textContent=`✅ Already migrated — ${skipped} lesson(s) found, nothing to do`; return; }
+    batch.commit()
+      .then(()=>{ statusEl.textContent=`✅ Migrated ${toAdd} lesson(s)${skipped?`, ${skipped} already existed`:''} — scroll down to see them`; })
+      .catch(err=>{ statusEl.textContent='⚠️ Failed: '+err.message; });
+  }).catch(err=>{ statusEl.textContent='⚠️ Failed: '+err.message; });
+}
+
+/* ══════════════════════════════════
+   LESSONS
+══════════════════════════════════ */
+let lessonPageCount=0;
+function addLessonPageField(){
+  const wrap=document.getElementById('lPagesWrap');
+  const i=lessonPageCount++;
+  const div=document.createElement('div');
+  div.style.cssText='background:var(--ink3);border:1px solid var(--wire);border-radius:12px;padding:12px;margin-bottom:10px';
+  div.innerHTML=`
+    <div style="font-size:11px;color:var(--fog);margin-bottom:6px">Page ${i+1}</div>
+    <input class="lp-title" placeholder="Page title" style="width:100%;padding:10px;margin-bottom:6px;background:var(--ink);border:1px solid var(--wire);border-radius:8px;color:var(--snow);font-size:12px;font-family:inherit"/>
+    <textarea class="lp-content" placeholder="Page content (HTML ok, e.g. <p>...</p>)" rows="4" style="width:100%;padding:10px;margin-bottom:6px;background:var(--ink);border:1px solid var(--wire);border-radius:8px;color:var(--snow);font-size:12px;font-family:inherit"></textarea>
+    <input class="lp-apply" placeholder="Apply It action step (optional)" style="width:100%;padding:10px;margin-bottom:6px;background:var(--ink);border:1px solid var(--wire);border-radius:8px;color:var(--snow);font-size:12px;font-family:inherit"/>
+    <label style="font-size:12px;color:var(--snow2);display:flex;align-items:center;gap:6px"><input type="checkbox" class="lp-free"/> Free page</label>
+  `;
+  wrap.appendChild(div);
+}
+addLessonPageField(); addLessonPageField(); // start with 2 fields
+
+function addLesson(){
+  const title=document.getElementById('lTitle').value.trim();
+  const blurb=document.getElementById('lBlurb').value.trim();
+  const icon=document.getElementById('lIcon').value.trim() || '📘';
+  const price=parseInt(document.getElementById('lPrice').value) || 0;
+  const pageEls=[...document.querySelectorAll('#lPagesWrap > div')];
+  const pages=pageEls.map(el=>({
+    title: el.querySelector('.lp-title').value.trim(),
+    content: el.querySelector('.lp-content').value.trim(),
+    apply: el.querySelector('.lp-apply').value.trim(),
+    free: el.querySelector('.lp-free').checked,
+  })).filter(p=>p.title);
+  if(!title || !pages.length){ alert('Add a title and at least one page'); return; }
+  const data={ title, blurb, icon, price, tag:'Strategy', pages, img: document.getElementById('lImage').value.trim() };
+  if (editingLessonId){
+    db.collection('learningTopics').doc(editingLessonId).update(data)
+      .then(cancelLessonEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  } else {
+    db.collection('learningTopics').add({ ...data, createdAt: firebase.firestore.FieldValue.serverTimestamp() })
+      .then(cancelLessonEdit)
+      .catch(err=>alert('Failed: '+err.message));
+  }
+}
+let unsubLessons=null;
+function listenLessons(){
+  if (unsubLessons) unsubLessons();
+  unsubLessons = db.collection('learningTopics').orderBy('createdAt','desc').onSnapshot(snap=>{
+    const list=document.getElementById('lessonsList');
+    if (snap.empty){ list.innerHTML=`<div class="empty">No admin lessons added yet.</div>`; return; }
+    list.innerHTML = snap.docs.map(doc=>{
+      const d=doc.data();
+      return `<div class="req-card">
+        <div class="req-title">${d.icon||'📘'} ${d.title}</div>
+        <div class="req-meta">₦${(d.price||0).toLocaleString()} · ${(d.pages||[]).length} pages</div>
+        <div class="req-actions"><button class="edit-btn" onclick="editLesson('${doc.id}')">Edit</button><button class="reject-btn" onclick="deleteDoc('learningTopics','${doc.id}')">Delete</button></div>
+      </div>`;
+    }).join('');
+  });
+}
+let editingLessonId=null;
+function editLesson(id){
+  db.collection('learningTopics').doc(id).get().then(doc=>{
+    if(!doc.exists) return;
+    const d=doc.data();
+    document.getElementById('lTitle').value=d.title||'';
+    document.getElementById('lBlurb').value=d.blurb||'';
+    document.getElementById('lIcon').value=d.icon||'📘';
+    document.getElementById('lImage').value=d.img||'';
+    document.getElementById('lPrice').value=d.price||'';
+    const wrap=document.getElementById('lPagesWrap');
+    wrap.innerHTML='';
+    lessonPageCount=0;
+    const pages=d.pages||[];
+    if (pages.length){
+      pages.forEach(p=>{
+        addLessonPageField();
+        const div=wrap.lastElementChild;
+        div.querySelector('.lp-title').value=p.title||'';
+        div.querySelector('.lp-content').value=p.content||'';
+        div.querySelector('.lp-apply').value=p.apply||'';
+        div.querySelector('.lp-free').checked=!!p.free;
+      });
+    } else {
+      addLessonPageField(); addLessonPageField();
+    }
+    editingLessonId=id;
+    document.getElementById('lSaveBtn').textContent='Update Lesson';
+    document.getElementById('lCancelBtn').style.display='block';
+    document.getElementById('lessonsSection').scrollIntoView({behavior:'smooth'});
+  }).catch(err=>alert('Failed to load: '+err.message));
+}
+function cancelLessonEdit(){
+  editingLessonId=null;
+  document.getElementById('lTitle').value='';
+  document.getElementById('lBlurb').value='';
+  document.getElementById('lImage').value='';
+  document.getElementById('lPreview').style.display='none';
+  document.getElementById('lUploadStatus').style.display='none';
+  document.getElementById('lPrice').value='';
+  document.getElementById('lPagesWrap').innerHTML='';
+  lessonPageCount=0;
+  addLessonPageField(); addLessonPageField();
+  document.getElementById('lSaveBtn').textContent='Save Lesson';
+  document.getElementById('lCancelBtn').style.display='none';
+}
+
+/* ══════════════════════════════════
+   SHARED DELETE HELPER
+══════════════════════════════════ */
+function deleteDoc(collection, id){
+  if (!confirm('Delete this? This cannot be undone.')) return;
+  db.collection(collection).doc(id).delete().catch(err=>alert('Failed: '+err.message));
+}
+
+function listenRequests(){
+  if (unsubReq) unsubReq();
+  let q = db.collection('unlockRequests').orderBy('createdAt','desc').limit(100);
+  if (curTab === 'pending') q = db.collection('unlockRequests').where('status','==','pending').orderBy('createdAt','desc');
+  unsubReq = q.onSnapshot(snap => {
+    const list = document.getElementById('reqList');
+    // "awaiting_payment" = the person opened the paywall and got a code, but never
+    // actually paid/notified us — don't clutter the list with those.
+    const docs = snap.docs.filter(doc => doc.data().status !== 'awaiting_payment');
+    if (!docs.length) { list.innerHTML = `<div class="empty">No requests here yet.</div>`; return; }
+    list.innerHTML = docs.map(doc => {
+      const d = doc.data();
+      const id = doc.id;
+      const when = d.createdAt ? d.createdAt.toDate().toLocaleString() : '—';
+      const statusPill = d.status === 'approved'
+        ? `<span class="status-pill status-approved">Approved</span>`
+        : d.status === 'rejected'
+          ? `<span class="status-pill status-rejected">Rejected</span>`
+          : '';
+      return `
+        <div class="req-card">
+          <div class="req-top">
+            <div class="req-title">${d.topicTitle || d.topicId}</div>
+            <div class="req-amt">₦${(d.amount||0).toLocaleString()}</div>
+          </div>
+          <div class="req-meta">
+            🔑 Look for this in your bank transfer narration: <strong style="color:var(--snow);font-family:monospace">${id.slice(0,6).toUpperCase()}</strong> · User: ${d.uid ? d.uid.slice(0,8) : '—'}<br>
+            ${when} ${statusPill}
+          </div>
+          ${d.status==='pending' ? `
+          <div class="req-actions">
+            <button class="approve-btn" onclick="approveRequest('${id}','${d.uid}','${d.topicId}')">✓ Approve & Unlock</button>
+            <button class="reject-btn" onclick="rejectRequest('${id}')">Reject</button>
+          </div>` : ''}
+        </div>`;
+    }).join('');
+  }, err => {
+    console.error(err);
+    document.getElementById('reqList').innerHTML = `<div class="empty">Error loading requests. Check Firestore rules.</div>`;
+  });
+}
+
+function approveRequest(reqId, uid, topicId){
+  const batch = db.batch();
+  const userRef = db.collection('users').doc(uid);
+  const reqRef  = db.collection('unlockRequests').doc(reqId);
+  batch.set(userRef, { unlockedTopics: firebase.firestore.FieldValue.arrayUnion(topicId) }, { merge:true });
+  batch.update(reqRef, { status:'approved', approvedAt: firebase.firestore.FieldValue.serverTimestamp() });
+  batch.commit().catch(err => alert('Failed: ' + err.message));
+}
+function rejectRequest(reqId){
+  db.collection('unlockRequests').doc(reqId).update({ status:'rejected' }).catch(err => alert('Failed: ' + err.message));
+}
+</script>
+<!-- In-page camera capture — takes a photo without ever saving it to the phone's gallery -->
+<div id="cameraModal">
+  <div class="camera-note">Photo is uploaded directly — nothing is saved to your gallery</div>
+  <video id="cameraVideo" autoplay playsinline muted></video>
+  <div class="camera-controls">
+    <div class="camera-close" onclick="closeCamera()">✕</div>
+    <div class="camera-shutter" onclick="captureCameraPhoto()"></div>
+    <div class="camera-spacer"></div>
+  </div>
+</div>
+<canvas id="cameraCanvas" style="display:none"></canvas>
+
+</body>
+</html>
